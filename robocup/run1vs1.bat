@@ -1,13 +1,14 @@
 cd ./rcssserver-14.0.3-win
 start ./rcssserver.exe
 cd ..
-ping localhost
+timeout 1
 cd ./rcssmonitor-14.1.0-win
 start ./rcssmonitor.exe
 cd ..
+timeout 1
 cd ./BDIAgentKrislet
-call 1vs1.bat
+start java Krislet -team BDI
 cd ..
+timeout 1
 cd ./OriginalKrislet
-call 1vs1.bat
-
+start java Krislet -team Krislet

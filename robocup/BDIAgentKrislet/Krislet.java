@@ -33,7 +33,7 @@ class Krislet implements SendCommand
     // Parameters:
     //
     //	host (default "localhost")
-    //		The host name can either be a machine name, such as "java.sun.com" 
+    //		The host name can either be a machine name, such as "java.sun.com"
     //		or a string representing its IP address, such as "206.26.48.100."
     //
     //	port (default 6000)
@@ -45,15 +45,15 @@ class Krislet implements SendCommand
     //	asl (default Krislet.asl)
     //		Name of the ASL file for the agent (should be located in the AgentSpecifications directory).
     //
-    //	
-    public static void main(String a[])	
+    //
+    public static void main(String a[])
 	throws SocketException, IOException
     {
 	String	hostName = new String("");
 	int			port = 6000;
 	String	team = new String("Krislet3");
 	String	asl_file_name = new String("AgentSpecifications/Krislet.asl");
-	
+
 	try
 	    {
 		// First look for parameters
@@ -95,11 +95,12 @@ class Krislet implements SendCommand
 		System.err.println("");
 		System.err.println("USAGE: krislet [-parameter value]");
 		System.err.println("");
-		System.err.println("    Parameters  value        default");
-		System.err.println("   ------------------------------------");
-		System.err.println("    host        host_name    localhost");
-		System.err.println("    port        port_number  6000");
-		System.err.println("    team        team_name    Kris");
+		System.err.println("    Parameters  value            default");
+		System.err.println("   ----------------------------------------");
+		System.err.println("    host        host_name        localhost");
+		System.err.println("    port        port_number      6000");
+		System.err.println("    team        team_name        Kris");
+		System.err.println("    asl         asl_file_name    Krislet.asl");
 		System.err.println("");
 		System.err.println("    Example:");
 		System.err.println("      krislet -host www.host.com -port 6000 -team Poland");
@@ -112,12 +113,12 @@ class Krislet implements SendCommand
 				     port, team, asl_file_name);
 
 	// enter main loop
-	player.mainLoop();							
-    }  
+	player.mainLoop();
+    }
 
     //---------------------------------------------------------------------------
     // This constructor opens socket for  connection with server
-    public Krislet(InetAddress host, int port, String team, String asl_file_name) 
+    public Krislet(InetAddress host, int port, String team, String asl_file_name)
 	throws SocketException
     {
 	m_socket = new DatagramSocket();
@@ -127,7 +128,7 @@ class Krislet implements SendCommand
 	m_playing = true;
 	m_asl_file_name = asl_file_name;
     }
-																 
+
     //---------------------------------------------------------------------------
     // This destructor closes socket to server
     public void finalize()
@@ -232,7 +233,7 @@ class Krislet implements SendCommand
 
 	// initialize player's brain
 	m_brain = new Brain(this,
-			    m_team, 
+			    m_team,
 			    m.group(1).charAt(0),
 			    m_asl_file_name,
 			    m.group(3));
@@ -254,7 +255,7 @@ class Krislet implements SendCommand
     private void parseSensorInformation(String message)
 	throws IOException
     {
-	// First check kind of information		
+	// First check kind of information
 	Matcher m=message_pattern.matcher(message);
 	if(!m.matches())
 	    {
@@ -315,13 +316,13 @@ class Krislet implements SendCommand
     //---------------------------------------------------------------------------
 
     // This function waits for new message from server
-    private String receive() 
+    private String receive()
     {
 	byte[] buffer = new byte[MSG_SIZE];
 	DatagramPacket packet = new DatagramPacket(buffer, MSG_SIZE);
 	try{
 	    m_socket.receive(packet);
-	}catch(SocketException e){ 
+	}catch(SocketException e){
 	    System.out.println("shutting down...");
 	}catch(IOException e){
 	    System.err.println("socket receiving error " + e);
@@ -329,8 +330,8 @@ class Krislet implements SendCommand
 	return new String(buffer);
     }
 
-				
-								 
+
+
     //===========================================================================
     // Private members
     // class members
