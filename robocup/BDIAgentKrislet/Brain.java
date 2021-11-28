@@ -58,8 +58,6 @@ class Brain extends Thread implements SensorInput
     	start();
     }
 
-
-
     /**
     *   getPerceptions takes the current environment state percieved by the player
     *   and stored in m_memory and returns a list of descritized perceptions that
@@ -69,7 +67,6 @@ class Brain extends Thread implements SensorInput
         BallInfo ball = (BallInfo) m_memory.getObject("ball");
         GoalInfo goal = (GoalInfo) m_memory.getObject("goal");
 		List<ObjectInfo> players = m_memory.getObjects("player");
-
 
         List<Belief> previousPerceptions = perceptions;
         List<Belief> currentPerceptions = new LinkedList<Belief>();
@@ -84,8 +81,12 @@ class Brain extends Thread implements SensorInput
             }
         }else{
             currentPerceptions.add(Belief.BALL_SEEN);
-            if( ball.m_direction < 0.75) {
+            if( ball.m_distance < 0.75) {
                 currentPerceptions.add(Belief.AT_BALL);
+            }
+
+            if( ball.m_direction == 0) {
+                currentPerceptions.add(Belief.FACING_BALL);
             }
         }
 
@@ -94,12 +95,12 @@ class Brain extends Thread implements SensorInput
         }else{
             if(goal.getSide() == this.m_side){
                 currentPerceptions.add(Belief.OWN_GOAL_SEEN);
-                if( goal.m_direction < 0.75) {
+                if( goal.m_distance < 0.75) {
                     currentPerceptions.add(Belief.AT_OWN_NET);
                 }
             }else{
                 currentPerceptions.add(Belief.ENEMY_GOAL_SEEN);
-                if( goal.m_direction < 0.75) {
+                if( goal.m_distance < 0.75) {
                     currentPerceptions.add(Belief.AT_OPPOSING_NET);
                 }
             }
@@ -108,11 +109,12 @@ class Brain extends Thread implements SensorInput
         if(players.size() > 0){
             if(ball != null){
                 double ballDistance = ball.getDistance();
+                double ballDirection = ball.getDirection();
                 double shortestBallDistance = 0;
                 for (ObjectInfo currentPlayer : players) {
                     PlayerInfo player = (PlayerInfo) currentPlayer;
                     if(player.m_teamName.equals(m_team)){
-                        shortestBallDistance = Math.sqrt(Math.pow(ballDistance, 2) + Math.pow(player.m_distance, 2) - 2 * ballDistance * player.m_distance);
+                        shortestBallDistance = Math.sqrt(Math.pow(ballDistance, 2) + Math.pow(player.m_distance, 2) - 2 * ballDistance * player.m_distance * Math.cos(Math.abs(ballDirection - player.m_direction)));
                     }
                     if(shortestBallDistance < ballDistance){
                         currentPerceptions.add(Belief.TEAMMATE_CLOSER_TO_BALL);
@@ -124,7 +126,6 @@ class Brain extends Thread implements SensorInput
                     }
                 }
             }
-
         }else{
 
         }
@@ -143,8 +144,6 @@ class Brain extends Thread implements SensorInput
 		BallInfo ball = (BallInfo) m_memory.getObject("ball");
         GoalInfo goal = (GoalInfo) m_memory.getObject("goal");
 		PlayerInfo player = (PlayerInfo) m_memory.getObject("player");
-
-
 
         try {
             switch(intent){
@@ -235,8 +234,7 @@ class Brain extends Thread implements SensorInput
     	if(Pattern.matches("^before_kick_off.*",m_playMode))
     	    m_krislet.move( -Math.random()*52.5 , 34 - Math.random()*68.0 );
 
-    	while( !m_timeOver )
-    	{
+    	while( !m_timeOver ){
     		// sleep one step to ensure that we will not send
     		// two commands in one cycle.
     		try{

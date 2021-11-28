@@ -25,7 +25,4 @@ public enum Intent {
     RUN_TO_BALL,
     RUN_TO_OWN_GOAL,
     RUN_TO_OPPOSING_GOAL,
-
-    REST
-
 }

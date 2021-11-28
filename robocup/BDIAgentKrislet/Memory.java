@@ -40,9 +40,8 @@ class Memory
 	return null;
     }
 
-
     //---------------------------------------------------------------------------
-    // This function looks for specified object
+    // This function looks for all instances of a specified object name
     public List<ObjectInfo> getObjects(String name) 
     {
     List<ObjectInfo> objects = new LinkedList<ObjectInfo>();
