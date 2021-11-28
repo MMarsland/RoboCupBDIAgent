@@ -8,28 +8,42 @@
 //    Modified by:      Edgar Acosta
 //    Date:             March 4, 2008
 
+
+// Modefied By:  ----
+
+
 import java.lang.Math;
 import java.util.regex.*;
 
+
+    
+
+
 class Brain extends Thread implements SensorInput
 {
-    //---------------------------------------------------------------------------
+    
+	private SendCommand	m_krislet;			// robot which is controled by this brain
+    volatile private boolean m_timeOver;
+    private String m_playMode;
+	private Memory m_memory;				// place where all information is stored
+    private char m_side;
+	private int m_number;
+	private BDIAgent BDI_agent;  
+	
+
+	//---------------------------------------------------------------------------
     // This constructor:
     // - stores connection to krislet
     // - starts thread for this object
-    public Brain(SendCommand krislet, 
-		 String team, 
-		 char side, 
-		 int number, 
-		 String playMode)
-    {
+    public Brain(SendCommand krislet, String team, char side, int number, String playMode){
 	m_timeOver = false;
 	m_krislet = krislet;
 	m_memory = new Memory();
 	//m_team = team;
 	m_side = side;
-	// m_number = number;
+	m_number = number;
 	m_playMode = playMode;
+	BDI_agent = new BDIAgent(m_number);
 	start();
     }
 
@@ -144,12 +158,6 @@ class Brain extends Thread implements SensorInput
     }
 
 
-    //===========================================================================
-    // Private members
-    private SendCommand	                m_krislet;			// robot which is controled by this brain
-    private Memory			m_memory;				// place where all information is stored
-    private char			m_side;
-    volatile private boolean		m_timeOver;
-    private String                      m_playMode;
+   
     
 }
