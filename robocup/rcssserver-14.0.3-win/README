@@ -1,0 +1,50 @@
+============
+INTRODUCTION
+============
+
+The RoboCup Soccer Simulator Server (rcssserver) is a research and
+educational tool for mutli-agent systems and artificial
+intelligence. It allows 11 simulated autonomous robotic players to
+play soccer (football).
+
+===========
+LICENSE
+===========
+This software is released as FREEWARE, but it may not be sold or be
+included in a product or package which intends to receive benefits
+through the inclusion of this software. This software may be
+distributed freely over the internet as long as the files remain
+unmodified.
+
+===================
+USING THE SIMULATOR
+===================
+
+To run "rcssserver.exe" to start the server
+
+rcssserver will look in the current working folder for the
+configuration files:
+
+`server.conf'
+`palyer.conf'
+`CSVSaver.conf'
+
+If these files do not exist they will be created and populated with
+default values.
+
+You can then see what's happening in the simulator by using
+monitor. There are a few robocup simulation montior freely
+avaiable. The rcsslogplayer windows binary can be used as a monitor
+client.
+
+==============
+Making Contact
+==============
+
+For bug reports, feature requests and latest updates, please goto
+	http://sourceforge.net/projects/sserver/
+or email bugs to
+	sserver-bugs@lists.sourceforge.net
+
+The RoboCup Soccer Server Maintainance Group
+	sserver-admin@lists.sourceforge.net
