@@ -27,7 +27,7 @@ class Brain extends Thread implements SensorInput
     private String m_playMode;
 	private Memory m_memory;				// place where all information is stored
     private char m_side;
-	private int m_number;
+	private String m_agent_asl;
 	private BDIAgent BDI_agent;  
 	
 
@@ -35,15 +35,15 @@ class Brain extends Thread implements SensorInput
     // This constructor:
     // - stores connection to krislet
     // - starts thread for this object
-    public Brain(SendCommand krislet, String team, char side, int number, String playMode){
+    public Brain(SendCommand krislet, String team, char side, String agent_asl, String playMode){
 	m_timeOver = false;
 	m_krislet = krislet;
 	m_memory = new Memory();
 	//m_team = team;
 	m_side = side;
-	m_number = number;
+	m_agent_asl = agent_asl;
 	m_playMode = playMode;
-	BDI_agent = new BDIAgent(m_number);
+	BDI_agent = new BDIAgent(m_agent_asl);
 	start();
     }
 

@@ -41,6 +41,9 @@ class Krislet implements SendCommand
     //
     //	team (default Kris)
     //		Team name. This name can not contain spaces.
+	//
+    //	asl (default Krislet.asl)
+    //		Name of the ASL file for the agent (should be located in the AgentSpecifications directory).
     //
     //	
     public static void main(String a[])	
@@ -49,6 +52,7 @@ class Krislet implements SendCommand
 	String	hostName = new String("");
 	int			port = 6000;
 	String	team = new String("Krislet3");
+	String	asl_file_name = new String("AgentSpecifications/Krislet.asl");
 	
 	try
 	    {
@@ -66,6 +70,19 @@ class Krislet implements SendCommand
 			else if( a[c].compareTo("-team") == 0 )
 			    {
 				team = a[c+1];
+			    }
+			// Check for a flag specifying which ASL file to use for the agent.
+			else if( a[c].compareTo("-asl") == 0 )
+			    {
+					// If the file exists set it as the ASL file name.
+					File f = new File("AgentSpecifications/" + a[c+1]);
+					if (f.exists()) {
+						asl_file_name = "AgentSpecifications/" + a[c+1];
+						System.out.println("Using file: " + asl_file_name);
+					}
+					else {
+						System.out.println("Cannot find the specified ASL file, defaulting to Krislet.asl");
+					}
 			    }
 			else
 			    {
@@ -92,7 +109,7 @@ class Krislet implements SendCommand
 	    }
 
 	Krislet player = new Krislet(InetAddress.getByName(hostName),
-				     port, team);
+				     port, team, asl_file_name);
 
 	// enter main loop
 	player.mainLoop();							
@@ -100,7 +117,7 @@ class Krislet implements SendCommand
 
     //---------------------------------------------------------------------------
     // This constructor opens socket for  connection with server
-    public Krislet(InetAddress host, int port, String team) 
+    public Krislet(InetAddress host, int port, String team, String asl_file_name) 
 	throws SocketException
     {
 	m_socket = new DatagramSocket();
@@ -108,6 +125,7 @@ class Krislet implements SendCommand
 	m_port = port;
 	m_team = team;
 	m_playing = true;
+	m_asl_file_name = asl_file_name;
     }
 																 
     //---------------------------------------------------------------------------
@@ -216,7 +234,7 @@ class Krislet implements SendCommand
 	m_brain = new Brain(this,
 			    m_team, 
 			    m.group(1).charAt(0),
-			    Integer.parseInt(m.group(2)),
+			    m_asl_file_name,
 			    m.group(3));
     }
 
@@ -322,6 +340,7 @@ class Krislet implements SendCommand
     private String		m_team;			// team name
     private SensorInput		m_brain;		// input for sensor information
     private boolean             m_playing;              // controls the MainLoop
+	private String		m_asl_file_name;		// name of the ASL
     private Pattern message_pattern = Pattern.compile("^\\((\\w+?)\\s.*");
     private Pattern hear_pattern = Pattern.compile("^\\(hear\\s(\\w+?)\\s(\\w+?)\\s(.*)\\).*");
     //private Pattern coach_pattern = Pattern.compile("coach");

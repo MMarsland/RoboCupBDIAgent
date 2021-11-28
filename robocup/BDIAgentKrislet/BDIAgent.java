@@ -7,8 +7,8 @@ import java.util.regex.*;
 
 class BDIAgent 
 {
-    public BDIAgent(int playerTypr){
-		
+    public BDIAgent(String asl_file_name){
+
 	}
 	
     
