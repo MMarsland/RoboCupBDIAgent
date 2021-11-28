@@ -2,7 +2,9 @@
 //	File:			Memory.java
 //	Author:		Krzysztof Langner
 //	Date:			1997/04/28
-//
+//  Modified by:      Jon Menard
+//  Date:             November 28, 2021
+import java.util.*;
 
 class Memory 
 {
@@ -36,6 +38,25 @@ class Memory
 	    }												 
 
 	return null;
+    }
+
+
+    //---------------------------------------------------------------------------
+    // This function looks for specified object
+    public List<ObjectInfo> getObjects(String name) 
+    {
+    List<ObjectInfo> objects = new LinkedList<ObjectInfo>();
+	if( m_info == null )
+	    waitForNewInfo();
+
+	for(int c = 0 ; c < m_info.m_objects.size() ; c ++)
+	    {
+		ObjectInfo object = (ObjectInfo)m_info.m_objects.elementAt(c);
+		if(object.m_type.compareTo(name) == 0)
+            objects.add(object);
+	    }												 
+
+	return objects;
     }
 
 
