@@ -17,11 +17,6 @@ import java.util.*;
 import java.util.regex.*;
 
 
-
-
-
-
-
 /**
 *   Handler class for the BDIAgent
 *   This class descritizes the envrionment into "Beliefs" and also
