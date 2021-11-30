@@ -12,3 +12,4 @@ cd ..
 timeout 1
 cd ./OriginalKrislet
 start java Krislet -team Krislet
+cd ..

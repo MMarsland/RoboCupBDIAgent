@@ -10,4 +10,4 @@ call 5vs5.bat
 cd ..
 cd ./OriginalKrislet
 call 5vs5.bat
-
+cd ..
