@@ -1,1 +1,1 @@
-cmd /c start java -cp .;jason-3.0.jar JasonAgent \k
+cmd /c start java -cp .;jason-2.3.jar JasonAgent \k

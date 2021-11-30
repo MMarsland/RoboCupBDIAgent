@@ -59,6 +59,21 @@ public class JasonAgent extends AgArch {
     }
 
 
+    public void run() {
+        try {
+            while (isRunning()) {
+                // calls the Jason engine to perform one reasoning cycle
+                //logger.fine("Reasoning....");
+                getTS().reasoningCycle();
+                System.out.println("isRunning");
+                if (getTS().canSleep())
+                    sleep();
+            }
+        } catch (Exception e) {
+            //logger.log(Level.SEVERE, "Run error", e);
+        }
+    }
+
 
     @Override
     public List<Literal> perceive() {
@@ -129,6 +144,7 @@ public class JasonAgent extends AgArch {
     public static void main(String a[]){
         //new RunLocalMAS().setupLogger();
         JasonAgent jason = new JasonAgent("attacker.asl");
+        jason.run();
         System.out.println(jason.agentType);
 
         // Keep the main open, so you can debug
