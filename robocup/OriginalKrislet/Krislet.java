@@ -46,6 +46,7 @@ class Krislet implements SendCommand
     public static void main(String a[])	
 	throws SocketException, IOException
     {
+		
 	String	hostName = new String("");
 	int			port = 6000;
 	String	team = new String("Krislet3");

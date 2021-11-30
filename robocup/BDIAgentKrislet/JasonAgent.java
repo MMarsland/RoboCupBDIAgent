@@ -34,13 +34,12 @@ public class JasonAgent extends AgArch {
     private List<Belief> cyclePerceptions;
 
     public JasonAgent(String agent_asl) {
-         Agent ag = new Agent();
-         new TransitionSystem(ag, new Circumstance(), new Settings(), this);
-        
+        Agent ag = new Agent();
+        new TransitionSystem(ag, new Circumstance(), new Settings(), this);
+    
         try {
             ag.initAg(agent_asl);
-        }
-        catch(JasonException e){
+        }catch(JasonException e){
             System.out.println(e.toString());
         }
     }
@@ -56,8 +55,12 @@ public class JasonAgent extends AgArch {
     *   the jason librbary.
     */
     public Intent getIntent(List<Belief> perceptions) {
+        //System.out.println("before2");
         cyclePerceptions = perceptions;
+        System.out.println("before run statment");
+        //System.out.println("mid");
         run();
+        //System.out.println("end");
         return cycleIntent;
     }
 
@@ -67,9 +70,13 @@ public class JasonAgent extends AgArch {
     */
     public void run() {
         running = true;
+
         while (isRunning()) {
+        
           // calls the Jason engine to perform one reasoning cycle
+          //System.out.println("in while loop");
           getTS().reasoningCycle();
+          //System.out.println("past getTS");
           // Sleep for 1 second so we don't run extra reasoning cycles
           // if we don't need to
           if (canSleep()) {
@@ -87,7 +94,7 @@ public class JasonAgent extends AgArch {
         // TODO
         //l.add(Literal.parseLiteral("x(10)"));
         for (Belief perception : cyclePerceptions) {
-            l.add(Literal.parseLiteral(perception.toString()));
+            l.add(Literal.parseLiteral(perception.toString().toLowerCase()));
         }
         return l;
     }
@@ -98,18 +105,22 @@ public class JasonAgent extends AgArch {
     *   running so we can return the selected intent to Brain.java
     */
     public void act(ActionExec action) {
+
+        //System.out.println("in act---");
+
         getTS().getLogger().info("Agent " + getAgName() + " is doing: " + action.getActionTerm());
         // return confirming the action execution was OK
         action.setResult(true);
+        //System.out.println("before action Executed");
         actionExecuted(action);
 
-        cycleIntent = Intent.valueOf(action.getActionTerm().toString());
+        cycleIntent = Intent.valueOf(action.getActionTerm().toString().toUpperCase());
         running = false;
     }
 
     /** Sleeps the thread for 1 second */
     public void sleep() {
-        try {   Thread.sleep(1000); } catch (InterruptedException e) {}
+        try {   Thread.sleep(10); } catch (InterruptedException e) {}
     }
 
     /** If the reasoning cycle process is running
@@ -136,5 +147,11 @@ public class JasonAgent extends AgArch {
     public void broadcast(jason.asSemantics.Message m) throws Exception {
     }
     public void checkMail() {
+    }
+
+    public static void main(String a[]){
+        //new RunLocalMAS().setupLogger();
+        JasonAgent jason = new JasonAgent("AgentSpecifications/Krislet.asl");
+        jason.run();
     }
 }

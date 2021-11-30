@@ -1,43 +1,43 @@
-!findBall.
+!findball.
 
-+!findBall
-    :   BALL_SEEN & not AT_BALL 
-    <-  TURN_TO_BALL;
-        !moveToBall.
++!findball
+    :   ball_seen & not at_ball 
+    <-  turn_to_ball;
+        !movetoball.
 
-+!findBall
-    :   not BALL_SEEN;
-    <-  LOOK_FOR_BALL;
-        !findBall.
++!findball
+    :   not ball_seen
+    <-  look_for_ball;
+        !findball.
 
-+!findBall
-    :   BALL_SEEN & AT_BALL & ENEMY_GOAL_SEEN
-    <-  KICK_AT_NET;
-        !findBall.
++!findball
+    :   ball_seen & at_ball & enemy_goal_seen
+    <-  kick_at_net;
+        !findball.
 
-+!findBall
-    :   BALL_SEEN & AT_BALL & not ENEMY_GOAL_SEEN
-    <-  !findOppGoal.
++!findball
+    :   ball_seen & at_ball & not enemy_goal_seen
+    <-  !findoppgoal.
 
-+!moveToBall
-    :   BALL_SEEN & not FACING_BALL
-    <-  !findBall.
++!movetoball
+    :   not ball_seen | not facing_ball
+    <-  !findball.
 
-+!moveToBall
-    :   BALL_SEEN & FACING_BALL
-    <-  RUN_TO_BALL;
-        !findBall.
++!movetoball
+    :   ball_seen & facing_ball
+    <-  run_to_ball;
+        !findball.
 
-+!findOppGoal
-    :   not ENEMY_GOAL_SEEN
-    <-  LOOK_FOR_OPPOSING_GOAL;
-        !findOppGoal.
++!findoppgoal
+    :   not enemy_goal_seen & at_ball
+    <-  look_for_opposing_goal;
+        !findoppgoal.
 
-+!findOppGoal
-    :   ENEMY_GOAL_SEEN & AT_BALL
-    <-  KICK_AT_NET;
-        !findBall.
++!findoppgoal
+    :   enemy_goal_seen & at_ball
+    <-  kick_at_net;
+        !findball.
 
-+!findOppGoal
-    :   ENEMY_GOAL_SEEN & not AT_BALL
-    <-  !findBall.
++!findoppgoal
+    :   enemy_goal_seen & not at_ball
+    <-  !findball.

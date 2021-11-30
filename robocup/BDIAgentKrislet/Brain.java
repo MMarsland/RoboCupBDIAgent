@@ -60,7 +60,17 @@ class Brain extends Thread implements SensorInput
     */
     public List<Belief> getPerceptions() {
         BallInfo ball = (BallInfo) m_memory.getObject("ball");
-        GoalInfo goal = (GoalInfo) m_memory.getObject("goal");
+
+        GoalInfo ownGoal;
+        GoalInfo opposingGoal;
+        if(this.m_side == 'r'){
+            ownGoal = (GoalInfo) m_memory.getObject("goal r");
+            opposingGoal = (GoalInfo) m_memory.getObject("goal l");
+
+        }else{
+            ownGoal = (GoalInfo) m_memory.getObject("goal l");
+            opposingGoal = (GoalInfo) m_memory.getObject("goal r");
+        }
 		List<ObjectInfo> players = m_memory.getObjects("player");
 
         List<Belief> previousPerceptions = perceptions;
@@ -71,31 +81,34 @@ class Brain extends Thread implements SensorInput
         //TODO-?: Are we using hard negation? Can we remove beliefs if they are
         // not present in the perceptions? How do we establish this in Jason?
         if( ball == null ){
-            if(previousPerceptions.contains(Belief.BALL_SEEN)){
-                currentPerceptions.add(Belief.BALL_WENT_PAST);
-            }
+            //if(previousPerceptions.contains(Belief.BALL_SEEN)){
+               // currentPerceptions.add(Belief.BALL_WENT_PAST);
+            //}
         }else{
             currentPerceptions.add(Belief.BALL_SEEN);
             if( ball.m_distance < 0.75) {
                 currentPerceptions.add(Belief.AT_BALL);
             }
 
-            if( ball.m_direction == 0) {
+            if(Math.abs(ball.m_direction) < 10) {
                 currentPerceptions.add(Belief.FACING_BALL);
             }
         }
 
-        if(goal == null ){
-            
+        if(ownGoal == null && opposingGoal == null){
+            System.out.println("Can not see any goals");
         }else{
-            if(goal.getSide() == this.m_side){
+            if(ownGoal != null){
                 currentPerceptions.add(Belief.OWN_GOAL_SEEN);
-                if( goal.m_distance < 0.75) {
+                if( ownGoal.m_distance < 0.75) {
                     currentPerceptions.add(Belief.AT_OWN_NET);
                 }
-            }else{
+            }
+            
+            if(opposingGoal != null){
                 currentPerceptions.add(Belief.ENEMY_GOAL_SEEN);
-                if( goal.m_distance < 0.75) {
+                
+                if( opposingGoal.m_distance < 0.75) {
                     currentPerceptions.add(Belief.AT_OPPOSING_NET);
                 }
             }
@@ -137,13 +150,22 @@ class Brain extends Thread implements SensorInput
         
 
 		BallInfo ball = (BallInfo) m_memory.getObject("ball");
-        GoalInfo goal = (GoalInfo) m_memory.getObject("goal");
+        GoalInfo ownGoal;
+        GoalInfo opposingGoal;
+        if(this.m_side == 'r'){
+            ownGoal = (GoalInfo) m_memory.getObject("goal r");
+            opposingGoal = (GoalInfo) m_memory.getObject("goal l");
+
+        }else{
+            ownGoal = (GoalInfo) m_memory.getObject("goal l");
+            opposingGoal = (GoalInfo) m_memory.getObject("goal r");
+        }
 		PlayerInfo player = (PlayerInfo) m_memory.getObject("player");
 
         try {
             switch(intent){
                 case KICK_AT_NET:
-                    m_krislet.kick(75, goal.m_direction);
+                    m_krislet.kick(75, opposingGoal.m_direction);
                     break;
                 case KICK_TO_PLAYER:
                     m_krislet.kick(75, player.m_direction);
@@ -152,8 +174,7 @@ class Brain extends Thread implements SensorInput
                     m_krislet.kick(75, 180);
                     break;
                 case LOOK_FOR_BALL:
-                    System.out.println("LOOK_FOR_BALL");
-                    m_krislet.turn(40);
+                    m_krislet.turn(70);
                     m_memory.waitForNewInfo();
                     break;
                 case LOOK_FOR_PLAYER:
@@ -169,30 +190,29 @@ class Brain extends Thread implements SensorInput
                     m_memory.waitForNewInfo();
                     break;
                 case TURN_TO_BALL:
-                    m_krislet.turn(40);
+                    m_krislet.turn(ball.m_direction);
                     m_memory.waitForNewInfo();
                     break;
                 case TURN_TO_OWN_GOAL:
-                     m_krislet.turn(goal.getDirection());
+                     m_krislet.turn(ownGoal.getDirection());
                     break;
                 case TURN_TO_OPPOSING_GOAL:
-                    m_krislet.turn(goal.getDirection());
+                    m_krislet.turn(opposingGoal.getDirection());
                     break;
                 case TURN_TO_PLAYER:
                     m_krislet.turn(player.getDirection());
                     break;
                 case RUN_TO_PLAYER:
-                    m_krislet.dash(10*player.m_distance);
+                    m_krislet.dash(100*player.m_distance);
                     break;
                 case RUN_TO_BALL:
-                    System.out.println("RUN_TO_BALL");
-                    m_krislet.dash(10*ball.m_distance);
+                    m_krislet.dash(100*ball.m_distance);
                     break;
                 case RUN_TO_OWN_GOAL:
-                    m_krislet.dash(10*goal.m_distance);
+                    m_krislet.dash(100*ownGoal.m_distance);
                     break;
                 case RUN_TO_OPPOSING_GOAL:
-                    m_krislet.dash(10*goal.m_distance);
+                    m_krislet.dash(100*opposingGoal.m_distance);
                     break;
                 default:
                     System.out.println("DEFAULT INTENT (WAITING)");
@@ -239,9 +259,15 @@ class Brain extends Thread implements SensorInput
 
             // Get current perceptions
             perceptions = this.getPerceptions();
+            System.out.println(perceptions.toString());
+            //for (ObjectInfo currentPlayer : players) {
             // Get an intent from the Jason Agent based on this cycles new
             // current perceptions so we can perform an action
+            System.out.println("before");
             Intent intent = agent.getIntent(perceptions);
+
+            System.out.println("after");
+            System.out.println(intent.toString());
             // Perform the action
             this.performIntent(intent);
         }
