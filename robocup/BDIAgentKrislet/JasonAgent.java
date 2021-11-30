@@ -38,10 +38,11 @@ public class JasonAgent extends AgArch {
          new TransitionSystem(ag, new Circumstance(), new Settings(), this);
         
         try {
+            System.out.println(agent_asl);
             ag.initAg(agent_asl);
         }
         catch(JasonException e){
-            System.out.println(e.toString());
+            System.out.println("An exception occured while initialising the agent:\n" + e.toString());
         }
     }
 
@@ -99,6 +100,7 @@ public class JasonAgent extends AgArch {
     */
     public void act(ActionExec action) {
         getTS().getLogger().info("Agent " + getAgName() + " is doing: " + action.getActionTerm());
+        System.out.println("Agent " + getAgName() + " is doing: " + action.getActionTerm());
         // return confirming the action execution was OK
         action.setResult(true);
         actionExecuted(action);

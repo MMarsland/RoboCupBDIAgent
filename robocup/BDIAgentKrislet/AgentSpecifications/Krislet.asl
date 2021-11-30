@@ -6,7 +6,7 @@
         !moveToBall.
 
 +!findBall
-    :   not BALL_SEEN;
+    :   not BALL_SEEN
     <-  LOOK_FOR_BALL;
         !findBall.
 
