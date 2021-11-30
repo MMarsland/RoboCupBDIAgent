@@ -1,1 +1,1 @@
-start java Krislet -team Yellow
+cmd /c start java -cp .;jason-2.3.jar JasonAgent \k
