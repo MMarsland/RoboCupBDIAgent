@@ -3,12 +3,15 @@
 // TODO: All all needed improts from Jason
 import jason.architecture.AgArch;
 import jason.asSyntax.*;
+import jason.asSemantics.*;
 import jason.environment.*;
-
+import jason.runtime.*;
+import jason.JasonException;
 
 import java.util.List;
 import java.util.LinkedList;
 import java.util.logging.*;
+import java.util.*;
 
 /*
 /**
@@ -33,19 +36,13 @@ public class JasonAgent extends AgArch {
     public JasonAgent(String agent_asl) {
          Agent ag = new Agent();
          new TransitionSystem(ag, new Circumstance(), new Settings(), this);
-
-         ag.initAg(agent_asl);
-    }
-
-    /**
-    *   Transforms the action from Jason (From the asl file)
-    *   into its intent form. This may take some switching or
-    *   just some modification of syntax between strings.
-    *
-    */
-    private Intent transformToIntnet(ActionExec action) {
-        // TRANSFROM "actionTerm" to our INTENT
-        return Intent.valueOf(action.getActionTerm().toString());
+        
+        try {
+            ag.initAg(agent_asl);
+        }
+        catch(JasonException e){
+            System.out.println(e.toString());
+        }
     }
 
     /**
@@ -106,7 +103,7 @@ public class JasonAgent extends AgArch {
         action.setResult(true);
         actionExecuted(action);
 
-        cycleIntnet = transformToIntent(action);
+        cycleIntent = Intent.valueOf(action.getActionTerm().toString());
         running = false;
     }
 

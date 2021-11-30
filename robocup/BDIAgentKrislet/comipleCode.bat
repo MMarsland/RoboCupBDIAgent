@@ -1,1 +1,1 @@
-start  javac -cp .;jason-2.3.jar JasonAgent.java
+javac -cp .;jason-2.3.jar *.java
