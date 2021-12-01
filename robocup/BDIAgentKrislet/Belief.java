@@ -17,4 +17,7 @@ public enum Belief {
     AT_BALL,
     AT_OWN_NET,
     AT_OPPOSING_NET,
+    ON_OWN_SIDE,
+    BALL_ON_OWN_SIDE,
+    FACING_OWN_GOAL,
 }

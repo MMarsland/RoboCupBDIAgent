@@ -100,17 +100,38 @@ class Brain extends Thread implements SensorInput
         }else{
             if(ownGoal != null){
                 currentPerceptions.add(Belief.OWN_GOAL_SEEN);
+                if(ownGoal.m_distance < 50.0) {
+                    currentPerceptions.add(Belief.ON_OWN_SIDE);
+                }
                 if( ownGoal.m_distance < 0.75) {
                     currentPerceptions.add(Belief.AT_OWN_NET);
+                }
+                if(ownGoal.m_direction < 10) {
+                    currentPerceptions.add(Belief.FACING_OWN_GOAL);
                 }
             }
             
             if(opposingGoal != null){
                 currentPerceptions.add(Belief.ENEMY_GOAL_SEEN);
-                
+                if(opposingGoal.m_distance > 75.0) {
+                    currentPerceptions.add(Belief.ON_OWN_SIDE);
+                }
                 if( opposingGoal.m_distance < 0.75) {
                     currentPerceptions.add(Belief.AT_OPPOSING_NET);
                 }
+            }
+        }
+
+        if (ball != null && ownGoal != null) {
+            double distance = Math.sqrt(Math.pow(ball.m_distance, 2) + Math.pow(ownGoal.m_distance, 2) - 2 * ball.m_distance * ownGoal.m_distance * Math.cos(Math.abs(ball.m_direction - ownGoal.m_direction)));
+            if (distance < 50.0) {
+                currentPerceptions.add(Belief.BALL_ON_OWN_SIDE);
+            }
+        }
+        else if (ball != null && opposingGoal != null) {
+            double distance = Math.sqrt(Math.pow(ball.m_distance, 2) + Math.pow(opposingGoal.m_distance, 2) - 2 * ball.m_distance * opposingGoal.m_distance * Math.cos(Math.abs(ball.m_direction - opposingGoal.m_direction)));
+            if (distance > 75.0) {
+                currentPerceptions.add(Belief.BALL_ON_OWN_SIDE);
             }
         }
 
