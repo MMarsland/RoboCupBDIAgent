@@ -2,12 +2,12 @@
 
 +!defend
     :   not on_own_side & not own_goal_seen 
-    <-  look_for_own_goal;
+    <-  look_right;
         !movetoownside.
 
 +!defend
     :   not ball_on_own_side & not teammate_closer_to_ball
-    <-  look_for_own_goal;
+    <-  look_right;
         !movetoownnet.
 
 +!defend

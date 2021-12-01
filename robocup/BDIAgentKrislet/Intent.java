@@ -12,11 +12,6 @@ public enum Intent {
 
     LOOK_LEFT,
     LOOK_RIGHT,
-    
-    LOOK_FOR_PLAYER,
-    LOOK_FOR_OWN_GOAL,
-    LOOK_FOR_OPPOSING_GOAL,
-
 
     TURN_TO_BALL,
     TURN_TO_OWN_GOAL,

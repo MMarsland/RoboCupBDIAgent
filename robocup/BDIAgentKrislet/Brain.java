@@ -230,10 +230,6 @@ class Brain extends Thread implements SensorInput
                     m_krislet.turn(70);
                     m_memory.waitForNewInfo();
                     break;
-                case LOOK_FOR_PLAYER:
-                    m_krislet.turn(40);
-                    m_memory.waitForNewInfo();
-                    break;
                 case TURN_TO_BALL:
                     m_krislet.turn(ball.m_direction);
                     m_memory.waitForNewInfo();
