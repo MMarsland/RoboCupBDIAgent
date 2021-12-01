@@ -6,8 +6,13 @@
         !movetoball.
 
 +!findball
+    :   not ball_seen & ball_to_left
+    <-  look_left;
+        !findball.
+
++!findball
     :   not ball_seen
-    <-  look_for_ball;
+    <-  look_right;
         !findball.
 
 +!findball
@@ -29,8 +34,13 @@
         !findball.
 
 +!findoppgoal
+    :   not enemy_goal_seen & at_ball & enemy_goal_to_left
+    <-  look_left;
+        !findoppgoal.
+
++!findoppgoal
     :   not enemy_goal_seen & at_ball
-    <-  look_for_opposing_goal;
+    <-  look_right;
         !findoppgoal.
 
 +!findoppgoal
@@ -39,5 +49,5 @@
         !findball.
 
 +!findoppgoal
-    :   enemy_goal_seen & not at_ball
+    :   not at_ball
     <-  !findball.

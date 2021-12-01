@@ -10,7 +10,9 @@ public enum Intent {
     KICK_TO_PLAYER,
     KICK_TO_DEFEND,
 
-    LOOK_FOR_BALL,
+    LOOK_LEFT,
+    LOOK_RIGHT,
+    
     LOOK_FOR_PLAYER,
     LOOK_FOR_OWN_GOAL,
     LOOK_FOR_OPPOSING_GOAL,

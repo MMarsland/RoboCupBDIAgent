@@ -120,7 +120,11 @@ public class JasonAgent extends AgArch {
 
     /** Sleeps the thread for 1 second */
     public void sleep() {
-        try {   Thread.sleep(10); } catch (InterruptedException e) {}
+        try{
+            Thread.sleep(0);
+        }catch(Exception e){
+            
+        } 
     }
 
     /** If the reasoning cycle process is running
