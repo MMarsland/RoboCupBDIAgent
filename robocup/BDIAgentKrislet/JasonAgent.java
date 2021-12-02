@@ -57,6 +57,7 @@ public class JasonAgent extends AgArch {
     public Intent getIntent(List<Belief> perceptions) {
         //System.out.println("before2");
         cyclePerceptions = perceptions;
+        System.out.println(cyclePerceptions);
         System.out.println("before run statment");
         //System.out.println("mid");
         run();

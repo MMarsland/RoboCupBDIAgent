@@ -109,9 +109,10 @@ class Brain extends Thread implements SensorInput
                 currentPerceptions.add(Belief.BALL_TO_RIGHT);
             }
 
-
-
-
+            // TODO: Check to see if you're a goalie
+            if(ball.m_distance < 25){
+                currentPerceptions.add(Belief.BALL_MED_DIST_FROM_GOALIE);
+            }
         }
 
         if(ownGoal == null && opposingGoal == null){
@@ -122,7 +123,7 @@ class Brain extends Thread implements SensorInput
                 if(ownGoal.m_distance < 50.0) {
                     currentPerceptions.add(Belief.ON_OWN_SIDE);
                 }
-                if( ownGoal.m_distance < 0.75) {
+                if( ownGoal.m_distance < 2) {
                     currentPerceptions.add(Belief.AT_OWN_NET);
                 }
                 if(ownGoal.m_direction < 10) {
@@ -221,6 +222,9 @@ class Brain extends Thread implements SensorInput
                     break;
                 case KICK_TO_DEFEND:
                     m_krislet.kick(75, 180);
+                    break;
+                case KICK_STRAIGHT:
+                    m_krislet.kick(75,0);
                     break;
                 case LOOK_LEFT:
                     m_krislet.turn(-70);

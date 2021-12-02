@@ -9,6 +9,7 @@ public enum Intent {
     KICK_AT_NET,
     KICK_TO_PLAYER,
     KICK_TO_DEFEND,
+    KICK_STRAIGHT,
 
     LOOK_LEFT,
     LOOK_RIGHT,
