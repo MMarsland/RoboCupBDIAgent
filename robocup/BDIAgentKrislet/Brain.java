@@ -90,9 +90,9 @@ class Brain extends Thread implements SensorInput
         //TODO-?: Are we using hard negation? Can we remove beliefs if they are
         // not present in the perceptions? How do we establish this in Jason?
         if( ball == null ){
-            if(previousPerceptions.contains(Belief.BALL_SEEN)){
-               currentPerceptions.add(Belief.BALL_WENT_PAST);
-            }
+            //if(previousPerceptions.contains(Belief.BALL_SEEN)){
+               //currentPerceptions.add(Belief.BALL_WENT_PAST);
+            //}
         }else{
             currentPerceptions.add(Belief.BALL_SEEN);
             if( ball.m_distance < 0.75) {
@@ -227,11 +227,11 @@ class Brain extends Thread implements SensorInput
                     m_krislet.kick(75,0);
                     break;
                 case LOOK_LEFT:
-                    m_krislet.turn(-70);
+                    m_krislet.turn(-80);
                     m_memory.waitForNewInfo();
                     break;
                 case LOOK_RIGHT:
-                    m_krislet.turn(70);
+                    m_krislet.turn(80);
                     m_memory.waitForNewInfo();
                     break;
                 case TURN_TO_BALL:
@@ -292,7 +292,7 @@ class Brain extends Thread implements SensorInput
 
     	// first put it somewhere on my side
     	if(Pattern.matches("^before_kick_off.*",m_playMode))
-    	    m_krislet.move( -Math.random()*52.5 , 34 - Math.random()*68.0 );
+    	    m_krislet.move( -Math.random()*52.5 , Math.random()*40.0 );
 
     	while( !m_timeOver ){
     		// sleep one step to ensure that we will not send

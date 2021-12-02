@@ -58,7 +58,19 @@
 
 +!movetodefend
     :   not own_goal_seen
-    <-  defend.
+    <-  turn_right;  
+        !findowngoal.
+
++!findowngoal
+    : not own_goal_seen
+    <- turn_right;
+        !findowngoal.
+
++!findowngoal
+    : own_goal_seen
+    <- turn_right;
+        !movetoownside.
+
 
 +!movetodefend
     :   own_goal_seen & not facing_own_goal & not at_own_net 
