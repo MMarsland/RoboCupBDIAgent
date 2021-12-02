@@ -36,7 +36,7 @@ public class JasonAgent extends AgArch {
     public JasonAgent(String agent_asl) {
         Agent ag = new Agent();
         new TransitionSystem(ag, new Circumstance(), new Settings(), this);
-    
+
         try {
             ag.initAg(agent_asl);
         }catch(JasonException e){
@@ -57,8 +57,6 @@ public class JasonAgent extends AgArch {
     public Intent getIntent(List<Belief> perceptions) {
         //System.out.println("before2");
         cyclePerceptions = perceptions;
-        System.out.println(cyclePerceptions);
-        System.out.println("before run statment");
         //System.out.println("mid");
         run();
         //System.out.println("end");
@@ -73,7 +71,7 @@ public class JasonAgent extends AgArch {
         running = true;
 
         while (isRunning()) {
-        
+
           // calls the Jason engine to perform one reasoning cycle
           //System.out.println("in while loop");
           getTS().reasoningCycle();
@@ -109,7 +107,6 @@ public class JasonAgent extends AgArch {
 
         //System.out.println("in act---");
 
-        getTS().getLogger().info("Agent " + getAgName() + " is doing: " + action.getActionTerm());
         // return confirming the action execution was OK
         action.setResult(true);
         //System.out.println("before action Executed");
@@ -124,8 +121,8 @@ public class JasonAgent extends AgArch {
         try{
             Thread.sleep(0);
         }catch(Exception e){
-            
-        } 
+
+        }
     }
 
     /** If the reasoning cycle process is running
@@ -136,7 +133,7 @@ public class JasonAgent extends AgArch {
     }
 
     /**
-    *  
+    *
     */
     public boolean canSleep() {
         return true;

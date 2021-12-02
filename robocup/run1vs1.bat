@@ -7,7 +7,7 @@ start ./rcssmonitor.exe
 cd ..
 timeout 1
 cd ./BDIAgentKrislet
-start java -cp .;jason-2.3.jar Krislet -team BDI -asl Defender.asl
+start java -cp .;jason-2.3.jar Krislet -team BDI -asl defender.asl
 cd ..
 timeout 1
 cd ./OriginalKrislet

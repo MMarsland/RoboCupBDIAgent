@@ -53,7 +53,7 @@ class Brain extends Thread implements SensorInput
     	m_playMode = playMode;
     	start();
         perceptions = new LinkedList<Belief>();
-        enviromentObjects = new ObjectInfo[5]; 
+        enviromentObjects = new ObjectInfo[5];
     }
 
     /**
@@ -63,7 +63,7 @@ class Brain extends Thread implements SensorInput
     */
     public List<Belief> getPerceptions() {
         BallInfo ball = (BallInfo) m_memory.getObject("ball");
-        
+
         GoalInfo ownGoal;
         GoalInfo opposingGoal;
         if(this.m_side == 'r'){
@@ -102,7 +102,7 @@ class Brain extends Thread implements SensorInput
             if(Math.abs(ball.m_direction) < 10) {
                 currentPerceptions.add(Belief.FACING_BALL);
             }
-            
+
             if(ball.m_direction < 0) {
                 currentPerceptions.add(Belief.BALL_TO_LEFT);
             }else{
@@ -126,11 +126,11 @@ class Brain extends Thread implements SensorInput
                 if( ownGoal.m_distance < 2) {
                     currentPerceptions.add(Belief.AT_OWN_NET);
                 }
-                if(ownGoal.m_direction < 10) {
+                if(Math.abs(ownGoal.m_direction) < 10) {
                     currentPerceptions.add(Belief.FACING_OWN_GOAL);
                 }
             }
-            
+
             if(opposingGoal != null){
                 currentPerceptions.add(Belief.ENEMY_GOAL_SEEN);
                 if(opposingGoal.m_distance > 75.0) {
@@ -169,25 +169,27 @@ class Brain extends Thread implements SensorInput
                 for (ObjectInfo currentPlayer : players) {
                     PlayerInfo player = (PlayerInfo) currentPlayer;
                     if(player.m_teamName.equals(m_team)){
-                        
+
                         if(!currentPerceptions.contains(Belief.TEAMMATE_AVAILABLE)){
                             currentPerceptions.add(Belief.TEAMMATE_AVAILABLE);
                             this.enviromentObjects[3] = player;
                         }
                         shortestBallDistance = Math.sqrt(Math.pow(ballDistance, 2) + Math.pow(player.m_distance, 2) - 2 * ballDistance * player.m_distance * Math.cos(Math.abs(ballDirection - player.m_direction)));
+                        if(shortestBallDistance < ballDistance){
+                            // TODO: BUGFIX @Jon or @Hari? // MAYBE SOLVED? by @Michael and @James
+                            // This is true for teammates and oppoenets.
+                            currentPerceptions.add(Belief.TEAMMATE_CLOSER_TO_BALL);
+                            if(shortestBallDistance < 0.75){
+                                currentPerceptions.add(Belief.TEAMMATE_AT_BALL);
+                            }
+                        }else{
+                            currentPerceptions.add(Belief.CLOSEST_TO_BALL);
+                        }
                     }else{
                         if(player.m_distance < 0.5 && ball.m_distance < 0.75){
                             this.enviromentObjects[4] = player;
                             currentPerceptions.add(Belief.ENEMY_AT_BALL);
                         }
-                    }
-                    if(shortestBallDistance < ballDistance){
-                        currentPerceptions.add(Belief.TEAMMATE_CLOSER_TO_BALL);
-                        if(shortestBallDistance < 0.75){
-                            currentPerceptions.add(Belief.TEAMMATE_AT_BALL);    
-                        }
-                    }else{
-                        currentPerceptions.add(Belief.CLOSEST_TO_BALL);    
                     }
                 }
             }
@@ -198,13 +200,13 @@ class Brain extends Thread implements SensorInput
         return currentPerceptions;
     }
 
-    
+
     /**
     *   This function takes in the BDI Agents current intent and sends an
     *   action to krislet for the player to perform on the server.
     */
     public void performIntent(Intent intent) {
-        
+
 
 		BallInfo ball = (BallInfo) enviromentObjects[0];
         GoalInfo ownGoal = (GoalInfo) enviromentObjects[1];;
@@ -304,14 +306,15 @@ class Brain extends Thread implements SensorInput
 
             // Get current perceptions
             perceptions = this.getPerceptions();
-            System.out.println(perceptions.toString());
+
             //for (ObjectInfo currentPlayer : players) {
             // Get an intent from the Jason Agent based on this cycles new
             // current perceptions so we can perform an action
-            System.out.println("before");
+            System.out.println("Starting Reasoning:");
+            System.out.println(perceptions.toString());
             Intent intent = agent.getIntent(perceptions);
 
-            System.out.println("after");
+            System.out.println("Got Intent:");
             System.out.println(intent.toString());
             // Perform the action
             this.performIntent(intent);
