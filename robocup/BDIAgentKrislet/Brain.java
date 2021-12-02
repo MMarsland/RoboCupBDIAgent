@@ -149,14 +149,16 @@ class Brain extends Thread implements SensorInput
         }
 
         if (ball != null && ownGoal != null) {
-            double distance = Math.sqrt(Math.pow(ball.m_distance, 2) + Math.pow(ownGoal.m_distance, 2) - 2 * ball.m_distance * ownGoal.m_distance * Math.cos(Math.abs(ball.m_direction - ownGoal.m_direction)));
+            double angle_rads = (Math.abs(ball.m_direction - ownGoal.m_direction) * Math.PI) / 180.0;
+            double distance = Math.sqrt(Math.pow(ball.m_distance, 2) + Math.pow(ownGoal.m_distance, 2) - 2.0 * ball.m_distance * ownGoal.m_distance * Math.cos(angle_rads));
             if (distance < 50.0) {
                 currentPerceptions.add(Belief.BALL_ON_OWN_SIDE);
             }
         }
         else if (ball != null && opposingGoal != null) {
-            double distance = Math.sqrt(Math.pow(ball.m_distance, 2) + Math.pow(opposingGoal.m_distance, 2) - 2 * ball.m_distance * opposingGoal.m_distance * Math.cos(Math.abs(ball.m_direction - opposingGoal.m_direction)));
-            if (distance > 75.0) {
+            double angle_rads = (Math.abs(ball.m_direction - opposingGoal.m_direction) * Math.PI) / 180.0;
+            double distance = Math.sqrt(Math.pow(ball.m_distance, 2) + Math.pow(opposingGoal.m_distance, 2) - 2.0 * ball.m_distance * opposingGoal.m_distance * Math.cos(angle_rads));
+            if (distance > 60.0) {
                 currentPerceptions.add(Belief.BALL_ON_OWN_SIDE);
             }
         }
@@ -174,7 +176,8 @@ class Brain extends Thread implements SensorInput
                             currentPerceptions.add(Belief.TEAMMATE_AVAILABLE);
                             this.enviromentObjects[3] = player;
                         }
-                        shortestBallDistance = Math.sqrt(Math.pow(ballDistance, 2) + Math.pow(player.m_distance, 2) - 2 * ballDistance * player.m_distance * Math.cos(Math.abs(ballDirection - player.m_direction)));
+                        double angle_rads = (Math.abs(ballDirection - player.m_direction) * Math.PI) / 180.0;
+                        shortestBallDistance = Math.sqrt(Math.pow(ballDistance, 2) + Math.pow(player.m_distance, 2) - 2 * ballDistance * player.m_distance * Math.cos(angle_rads));
                         if(shortestBallDistance < ballDistance){
                             // TODO: BUGFIX @Jon or @Hari? // MAYBE SOLVED? by @Michael and @James
                             // This is true for teammates and oppoenets.

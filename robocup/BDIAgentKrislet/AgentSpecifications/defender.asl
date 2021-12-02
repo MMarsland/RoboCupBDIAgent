@@ -6,16 +6,18 @@ is_on_own_side.
     <-  !movetoownside.
 
 +!defend
-    :   not ball_on_own_side & not teammate_closer_to_ball & not at_own_net
-    <-  !movetoowngoal.
+    :   is_on_own_side & ball_was_on_own_side
+    <-  !movetoball.
 
 +!defend
-    :   is_on_own_side & ball_on_own_side
-    <-  !movetoball.
+    :   not was_at_own_goal & not ball_on_own_side & not teammate_closer_to_ball 
+    <-  !movetoowngoal.
 
 +!defend
     :   is_on_own_side
     <-  !findball.
+
+
 
 +!movetoownside
     :   not own_goal_seen
@@ -36,6 +38,8 @@ is_on_own_side.
     :   is_on_own_side
     <-  !findball.
 
+
+
 +!movetoowngoal
     :   not own_goal_seen
     <-  look_right;
@@ -53,48 +57,31 @@ is_on_own_side.
 
 +!movetoowngoal
     :   at_own_net
-    <-  !findball.
+    <-  +was_at_own_goal;
+        !findball.
 
 +!movetoowngoal
     :   ball_on_own_side
     <-  !movetoball.
 
-+!movetodefend
-    :   not own_goal_seen
-    <-  look_right;
-        !findowngoal.
 
-+!findowngoal
-    : not own_goal_seen
-    <- look_right;
-        !findowngoal.
-
-+!findowngoal
-    : own_goal_seen
-    <- look_right;
-        !movetoownside.
-
-+!movetodefend
-    :   own_goal_seen & not facing_own_goal & not at_own_net
-    <-  turn_to_own_goal;
-		!movetodefend.
-
-+!movetodefend
-    :   own_goal_seen & facing_own_goal & not at_own_net
-    <-  run_to_own_goal;
-		!movetodefend.
+/* 
+ * Plan to find the ball which keeps track of whether it was last to the left or right of the agent. The plan
+ * includes a catchall for moving to the ball if it can see it, is at it, but is not facing it (this was done 
+ * to break an infinite loop). 
+ */
 
 +!findball
     :   ball_seen & not at_ball & ball_to_left
     <-  turn_to_ball;
         +ball_was_left;
-        !defend.
+        !findballside.
 
 +!findball
     :   ball_seen & not at_ball & ball_to_right
     <-  turn_to_ball;
         -ball_was_left;
-        !defend.
+        !findballside.
 
 +!findball
     :   not ball_seen & ball_was_left
@@ -111,63 +98,87 @@ is_on_own_side.
     <-  turn_to_ball;
         !movetoball.
 
+
+
++!findballside
+    :   ball_seen & ball_on_own_side
+    <-  +ball_was_on_own_side;
+        !defend.
+
++!findballside
+    :   ball_seen & not ball_on_own_side
+    <-  -ball_was_on_own_side;
+        !defend.
+
++!findballside
+    :   not ball_seen
+    <-  !defend.
+
+
+
 +!movetoball
     :   at_ball
-    <-  !kick.
+    <-  +was_at_ball;
+        !kick.
 
 +!movetoball
     :   (not ball_seen | not facing_ball) & not at_ball
     <-  !findball.
 
 +!movetoball
-    :   ball_seen & facing_ball & enemy_goal_to_left & ball_on_own_side
+    :   ball_seen & facing_ball & enemy_goal_to_left & ball_was_on_own_side
     <-  run_to_ball;
         +enemy_goal_was_left;
+        -was_at_own_goal;
         !movetoball.
 
 +!movetoball
-    :   ball_seen & facing_ball & enemy_goal_to_right & ball_on_own_side
+    :   ball_seen & facing_ball & enemy_goal_to_right & ball_was_on_own_side
     <-  run_to_ball;
         -enemy_goal_was_left;
+        -was_at_own_goal;
         !movetoball.
 
 +!movetoball
-    :   ball_seen & facing_ball & ball_on_own_side
+    :   ball_seen & facing_ball & ball_was_on_own_side
     <-  run_to_ball;
+        -was_at_own_goal;
         !movetoball.
 
 +!movetoball
-    : not ball_on_own_side
+    :   not ball_was_on_own_side
     <-  !defend.
 
 +!kick
-    :   not at_ball
+    :   not was_at_ball
     <-  !movetoball.
 
 +!kick
-    :   at_ball & own_goal_seen
+    :   was_at_ball & own_goal_seen
     <-  kick_to_defend;
+        -was_at_ball;
         !defend.
 
 +!kick
-    :   at_ball
+    :   was_at_ball
     <-  !findoppgoal.
 
 +!findoppgoal
-    :   not enemy_goal_seen & at_ball & enemy_goal_was_left
+    :   not enemy_goal_seen & was_at_ball & enemy_goal_was_left
     <-  look_left;
         !findoppgoal.
 
 +!findoppgoal
-    :   not enemy_goal_seen & at_ball
+    :   not enemy_goal_seen & was_at_ball
     <-  look_right;
         !findoppgoal.
 
 +!findoppgoal
-    :   enemy_goal_seen & at_ball
+    :   enemy_goal_seen & was_at_ball
     <-  kick_at_net;
+        -was_at_ball;
         !defend.
 
 +!findoppgoal
-    :   enemy_goal_seen & not at_ball
+    :   enemy_goal_seen & not was_at_ball
     <-  !movetoball.

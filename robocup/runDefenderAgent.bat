@@ -1,2 +1,3 @@
 cd ./BDIAgentKrislet
-start java -cp .;jason-2.3.jar Krislet -team BDI -asl defender.asl
+start java -cp .;jason-2.3.jar Krislet -team Yellow -asl defender.asl
+cd ..
