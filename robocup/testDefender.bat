@@ -1,8 +1,8 @@
-cd ./rcssserver-14.0.3-win
+cd ./Server
 start ./rcssserver.exe
 cd ..
 timeout 1
-cd ./rcssmonitor-14.1.0-win
+cd ./Monitor
 start ./rcssmonitor.exe
 cd ..
 timeout 1
