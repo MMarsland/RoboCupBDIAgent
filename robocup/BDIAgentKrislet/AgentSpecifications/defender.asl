@@ -19,7 +19,7 @@ is_on_own_side.
 
 
 
-+!movetoownside
+/* +!movetoownside
     :   not own_goal_seen
     <-  look_right;
         !movetoownside.
@@ -36,7 +36,7 @@ is_on_own_side.
 
 +!movetoownside
     :   is_on_own_side
-    <-  !findball.
+    <-  !findball. */
 
 
 
@@ -71,14 +71,20 @@ is_on_own_side.
  * to break an infinite loop). 
  */
 
+
 +!findball
-    :   ball_seen & not at_ball & ball_to_left
+    :   ball_seen & at_ball
+    <-  +was_at_ball;
+        !kick.
+
++!findball
+    :   ball_seen & ball_to_left
     <-  turn_to_ball;
         +ball_was_left;
         !findballside.
 
 +!findball
-    :   ball_seen & not at_ball & ball_to_right
+    :   ball_seen & ball_to_right
     <-  turn_to_ball;
         -ball_was_left;
         !findballside.
@@ -93,10 +99,7 @@ is_on_own_side.
     <-  look_right;
         !findball.
 
-+!findball
-    :   ball_seen & at_ball
-    <-  turn_to_ball;
-        !movetoball.
+
 
 
 
@@ -126,21 +129,21 @@ is_on_own_side.
     <-  !findball.
 
 +!movetoball
-    :   ball_seen & facing_ball & enemy_goal_to_left & ball_was_on_own_side
+    :   ball_seen & facing_ball & enemy_goal_to_left & ball_was_on_own_side & not at_ball & not was_at_ball
     <-  run_to_ball;
         +enemy_goal_was_left;
         -was_at_own_goal;
         !movetoball.
 
 +!movetoball
-    :   ball_seen & facing_ball & enemy_goal_to_right & ball_was_on_own_side
+    :   ball_seen & facing_ball & enemy_goal_to_right & ball_was_on_own_side & not at_ball & not was_at_ball
     <-  run_to_ball;
         -enemy_goal_was_left;
         -was_at_own_goal;
         !movetoball.
 
 +!movetoball
-    :   ball_seen & facing_ball & ball_was_on_own_side
+    :   ball_seen & facing_ball & ball_was_on_own_side & not at_ball & not was_at_ball
     <-  run_to_ball;
         -was_at_own_goal;
         !movetoball.
@@ -154,7 +157,7 @@ is_on_own_side.
     <-  !movetoball.
 
 +!kick
-    :   was_at_ball & own_goal_seen
+    :   was_at_ball & not enemy_goal_seen
     <-  kick_to_defend;
         -was_at_ball;
         !defend.
@@ -167,6 +170,10 @@ is_on_own_side.
     :   not enemy_goal_seen & was_at_ball & enemy_goal_was_left
     <-  look_left;
         !findoppgoal.
+
++!findoppgoal
+    :   own_goal_seen & was_at_ball
+    <-  !kick.
 
 +!findoppgoal
     :   not enemy_goal_seen & was_at_ball
