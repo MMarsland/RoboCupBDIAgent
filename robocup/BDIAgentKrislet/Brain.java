@@ -16,6 +16,8 @@ import java.lang.Math;
 import java.util.*;
 import java.util.regex.*;
 
+import javax.sound.sampled.Line;
+
 
 /**
 *   Handler class for the BDIAgent
@@ -66,13 +68,36 @@ class Brain extends Thread implements SensorInput
         
         GoalInfo ownGoal;
         GoalInfo opposingGoal;
+        FlagInfo centre_c = (FlagInfo) m_memory.getObject("flag c");
+        FlagInfo centre_t = (FlagInfo) m_memory.getObject("flag t");
+        FlagInfo centre_b = (FlagInfo) m_memory.getObject("flag b");
+        FlagInfo goalie_line_c;
+        FlagInfo goalie_line_b;
+        FlagInfo goalie_line_t;
+                
+        if(centre_c != null){
+            System.out.println("Flag c: " + centre_c.getDistance());
+        }
+        if(centre_t != null){
+            System.out.println("Flag t: " + centre_t.getDistance());
+        }
+        if(centre_b != null){
+            System.out.println("Line B: " + centre_b.getDistance());
+        }
+
         if(this.m_side == 'r'){
             ownGoal = (GoalInfo) m_memory.getObject("goal r");
             opposingGoal = (GoalInfo) m_memory.getObject("goal l");
+            goalie_line_c = (FlagInfo) m_memory.getObject("flag p r c");
+            goalie_line_b = (FlagInfo) m_memory.getObject("flag p r b");
+            goalie_line_t = (FlagInfo) m_memory.getObject("flag p r t");
 
         }else{
             ownGoal = (GoalInfo) m_memory.getObject("goal l");
             opposingGoal = (GoalInfo) m_memory.getObject("goal r");
+            goalie_line_c = (FlagInfo) m_memory.getObject("flag p l c");
+            goalie_line_b = (FlagInfo) m_memory.getObject("flag p l b");
+            goalie_line_t = (FlagInfo) m_memory.getObject("flag p l t");
         }
 
         this.enviromentObjects[0] = ball;
@@ -115,6 +140,44 @@ class Brain extends Thread implements SensorInput
             }
         }
 
+        // Assume you can't see any of the centre flags
+        boolean closeToCentre = false;
+        boolean farFromCentre = false;
+
+        if(centre_t != null ){
+            double distance = Math.cos(Math.toRadians(centre_t.m_direction)) * centre_t.m_distance;
+            if(distance < 1){
+                closeToCentre = true;
+            }else{
+                farFromCentre = true;
+            }
+        }
+        if(centre_b != null ){
+            double distance = Math.cos(Math.toRadians(centre_b.m_direction)) * centre_b.m_distance;
+            if(distance < 1){
+                closeToCentre = true;
+            }else{
+                farFromCentre = true;
+            }
+        }
+        
+        if(centre_c != null){
+            double distance = Math.cos(Math.toRadians(centre_c.m_direction)) * centre_c.m_distance;
+            if(distance < 1){
+                closeToCentre = true;
+            }else{
+                farFromCentre = true;
+            }
+        }
+
+        // If the agent is close to any of the flags, add CLOSE_TO_CENTRE else only add CENTRE_LINE_SEEN
+        if(closeToCentre){
+            currentPerceptions.add(Belief.CENTRE_LINE_SEEN);
+            currentPerceptions.add(Belief.CLOSE_TO_CENTRE);
+        }else if(farFromCentre){
+            currentPerceptions.add(Belief.CENTRE_LINE_SEEN);
+        }
+
         if(ownGoal == null && opposingGoal == null){
             System.out.println("Can not see any goals");
         }else{
@@ -146,6 +209,43 @@ class Brain extends Thread implements SensorInput
                     currentPerceptions.add(Belief.ENEMY_GOAL_TO_RIGHT);
                 }
             }
+        }
+
+        // Assume goal line cannot be seen
+        boolean closeToGoalLine = false;
+        boolean farFromGoalLine = false;
+
+        if(goalie_line_t != null ){
+            double distance = Math.cos(Math.toRadians(goalie_line_t.m_direction)) * goalie_line_t.m_distance;
+            if(distance < 1){
+                closeToGoalLine = true;
+            }else{
+                farFromGoalLine = true;
+            }
+        }
+        if(goalie_line_b != null ){
+            double distance = Math.cos(Math.toRadians(goalie_line_b.m_direction)) * goalie_line_b.m_distance;
+            if(distance < 1){
+                closeToGoalLine = true;
+            }else{
+                farFromGoalLine = true;
+            }
+        }
+        
+        if(goalie_line_c != null){
+            double distance = Math.cos(Math.toRadians(goalie_line_c.m_direction)) * goalie_line_c.m_distance;
+            if(distance < 1){
+                closeToGoalLine = true;
+            }else{
+                farFromGoalLine = true;
+            }
+        }
+        
+        if(closeToGoalLine){
+            currentPerceptions.add(Belief.GOAL_LINE_SEEN);
+            currentPerceptions.add(Belief.CLOSE_TO_GOAL_LINE);
+        }else if(farFromGoalLine){
+            currentPerceptions.add(Belief.GOAL_LINE_SEEN);
         }
 
         if (ball != null && ownGoal != null) {
