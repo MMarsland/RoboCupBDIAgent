@@ -1,6 +1,23 @@
 !findball.
 
 +!findball
+    :   teammate_closer_to_ball & enemy_goal_seen & not ball_on_own_side
+    <-  run_to_opposing_goal;
+        !findball.
+
++!findball
+    :   ball_seen & not at_ball & ball_to_left & facing_ball
+    <-  run_to_ball;
+        +ball_was_left
+        !findball.
+
++!findball
+    :   ball_seen & not at_ball & ball_to_right & facing_ball
+    <-  run_to_ball;
+        -ball_was_left
+        !findball.
+
++!findball
     :   ball_seen & not at_ball & ball_to_left
     <-  turn_to_ball;
         +ball_was_left
@@ -21,6 +38,11 @@
     :   not ball_seen
     <-  look_right;
         !findball.
+
++!findball
+    :   ball_seen & at_ball & enemy_at_ball
+    <-  kick_to_side;
+        !findball.                       
 
 +!findball
     :   ball_seen & at_ball & enemy_goal_seen

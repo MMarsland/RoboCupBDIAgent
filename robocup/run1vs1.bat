@@ -8,8 +8,10 @@ cd ..
 timeout 1
 cd ./BDIAgentKrislet
 start java -cp .;jason-2.3.jar Krislet -team BDI -asl attacker.asl
+start java -cp .;jason-2.3.jar Krislet -team BDI -asl attacker.asl
 cd ..
 timeout 1
 cd ./OriginalKrislet
+start java Krislet -team Krislet
 start java Krislet -team Krislet
 cd ..
