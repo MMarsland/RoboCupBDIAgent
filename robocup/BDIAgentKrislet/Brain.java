@@ -116,7 +116,7 @@ class Brain extends Thread implements SensorInput
         }
 
         if(ownGoal == null && opposingGoal == null){
-            System.out.println("Can not see any goals");
+
         }else{
             if(ownGoal != null){
                 currentPerceptions.add(Belief.OWN_GOAL_SEEN);
@@ -170,6 +170,7 @@ class Brain extends Thread implements SensorInput
                 double shortestBallDistance = 0;
                 for (ObjectInfo currentPlayer : players) {
                     PlayerInfo player = (PlayerInfo) currentPlayer;
+                    
                     if(player.m_teamName.equals(m_team)){
 
                         if(!currentPerceptions.contains(Belief.TEAMMATE_AVAILABLE)){
@@ -189,7 +190,7 @@ class Brain extends Thread implements SensorInput
                             currentPerceptions.add(Belief.CLOSEST_TO_BALL);
                         }
                     }else{
-                        if(player.m_distance < 0.5 && ball.m_distance < 0.75){
+                        if(player.m_distance < 2 && ball.m_distance < 0.25){
                             this.enviromentObjects[4] = player;
                             currentPerceptions.add(Belief.ENEMY_AT_BALL);
                         }
@@ -228,6 +229,12 @@ class Brain extends Thread implements SensorInput
                 case KICK_TO_DEFEND:
                     m_krislet.kick(75, 180);
                     break;
+                case KICK_TO_SIDE:
+                    System.out.println(perceptions.toString());
+                    System.out.println("Kicking to side");
+                    m_krislet.kick(10, enemy.m_direction + 35);
+                    m_krislet.turn(45);
+                    break;
                 case KICK_STRAIGHT:
                     m_krislet.kick(75,0);
                     break;
@@ -256,7 +263,11 @@ class Brain extends Thread implements SensorInput
                     m_krislet.dash(100*player.m_distance);
                     break;
                 case RUN_TO_BALL:
-                    m_krislet.dash(100*ball.m_distance);
+                    if(ball.m_distance > 5){
+                        m_krislet.dash(50);
+                    }else{
+                        m_krislet.dash(100*ball.m_distance);
+                    }
                     break;
                 case RUN_TO_OWN_GOAL:
                     m_krislet.dash(100*ownGoal.m_distance);
@@ -313,12 +324,12 @@ class Brain extends Thread implements SensorInput
             //for (ObjectInfo currentPlayer : players) {
             // Get an intent from the Jason Agent based on this cycles new
             // current perceptions so we can perform an action
-            System.out.println("Starting Reasoning:");
-            System.out.println(perceptions.toString());
+            //System.out.println("Starting Reasoning:");
+            //System.out.println(perceptions.toString());
             Intent intent = agent.getIntent(perceptions);
 
-            System.out.println("Got Intent:");
-            System.out.println(intent.toString());
+            //System.out.println("Got Intent:");
+            //System.out.println(intent.toString());
             // Perform the action
             this.performIntent(intent);
         }
