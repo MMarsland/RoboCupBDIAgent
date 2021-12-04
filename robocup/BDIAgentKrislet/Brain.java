@@ -308,7 +308,7 @@ class Brain extends Thread implements SensorInput
 
     	// first put it somewhere on my side
     	if(Pattern.matches("^before_kick_off.*",m_playMode))
-    	    m_krislet.move( -Math.random()*52.5 , Math.random()*40.0 );
+    	    m_krislet.move( -Math.random()*20.5 , Math.random()*30.0 );
 
     	while( !m_timeOver ){
     		// sleep one step to ensure that we will not send
@@ -324,12 +324,12 @@ class Brain extends Thread implements SensorInput
             //for (ObjectInfo currentPlayer : players) {
             // Get an intent from the Jason Agent based on this cycles new
             // current perceptions so we can perform an action
-            //System.out.println("Starting Reasoning:");
-            //System.out.println(perceptions.toString());
+            System.out.println("Starting Reasoning:");
+            System.out.println(perceptions.toString());
             Intent intent = agent.getIntent(perceptions);
 
-            //System.out.println("Got Intent:");
-            //System.out.println(intent.toString());
+            System.out.println("Got Intent:");
+            System.out.println(intent.toString());
             // Perform the action
             this.performIntent(intent);
         }
