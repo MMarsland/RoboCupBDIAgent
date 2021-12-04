@@ -292,7 +292,7 @@ class Brain extends Thread implements SensorInput
     {
         // Establish Agent
         JasonAgent agent = new JasonAgent(this.m_agent_asl);
-
+        System.out.println("BDI Agent Loaded: Begining new game of RoboCup");
 
 
     	// first put it somewhere on my side
