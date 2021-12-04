@@ -55,7 +55,7 @@ class Brain extends Thread implements SensorInput
     	m_playMode = playMode;
     	start();
         perceptions = new LinkedList<Belief>();
-        enviromentObjects = new ObjectInfo[5]; 
+        enviromentObjects = new ObjectInfo[5];
     }
 
     /**
@@ -65,7 +65,7 @@ class Brain extends Thread implements SensorInput
     */
     public List<Belief> getPerceptions() {
         BallInfo ball = (BallInfo) m_memory.getObject("ball");
-        
+
         GoalInfo ownGoal;
         GoalInfo opposingGoal;
         FlagInfo centre_c = (FlagInfo) m_memory.getObject("flag c");
@@ -115,9 +115,9 @@ class Brain extends Thread implements SensorInput
         //TODO-?: Are we using hard negation? Can we remove beliefs if they are
         // not present in the perceptions? How do we establish this in Jason?
         if( ball == null ){
-            if(previousPerceptions.contains(Belief.BALL_SEEN)){
-               currentPerceptions.add(Belief.BALL_WENT_PAST);
-            }
+            //if(previousPerceptions.contains(Belief.BALL_SEEN)){
+               //currentPerceptions.add(Belief.BALL_WENT_PAST);
+            //}
         }else{
             currentPerceptions.add(Belief.BALL_SEEN);
             if( ball.m_distance < 0.75) {
@@ -127,7 +127,7 @@ class Brain extends Thread implements SensorInput
             if(Math.abs(ball.m_direction) < 10) {
                 currentPerceptions.add(Belief.FACING_BALL);
             }
-            
+
             if(ball.m_direction < 0) {
                 currentPerceptions.add(Belief.BALL_TO_LEFT);
             }else{
@@ -189,11 +189,11 @@ class Brain extends Thread implements SensorInput
                 if( ownGoal.m_distance < 2) {
                     currentPerceptions.add(Belief.AT_OWN_NET);
                 }
-                if(ownGoal.m_direction < 10) {
+                if(Math.abs(ownGoal.m_direction) < 10) {
                     currentPerceptions.add(Belief.FACING_OWN_GOAL);
                 }
             }
-            
+
             if(opposingGoal != null){
                 currentPerceptions.add(Belief.ENEMY_GOAL_SEEN);
                 if(opposingGoal.m_distance > 75.0) {
@@ -249,14 +249,16 @@ class Brain extends Thread implements SensorInput
         }
 
         if (ball != null && ownGoal != null) {
-            double distance = Math.sqrt(Math.pow(ball.m_distance, 2) + Math.pow(ownGoal.m_distance, 2) - 2 * ball.m_distance * ownGoal.m_distance * Math.cos(Math.abs(ball.m_direction - ownGoal.m_direction)));
+            double angle_rads = (Math.abs(ball.m_direction - ownGoal.m_direction) * Math.PI) / 180.0;
+            double distance = Math.sqrt(Math.pow(ball.m_distance, 2) + Math.pow(ownGoal.m_distance, 2) - 2.0 * ball.m_distance * ownGoal.m_distance * Math.cos(angle_rads));
             if (distance < 50.0) {
                 currentPerceptions.add(Belief.BALL_ON_OWN_SIDE);
             }
         }
         else if (ball != null && opposingGoal != null) {
-            double distance = Math.sqrt(Math.pow(ball.m_distance, 2) + Math.pow(opposingGoal.m_distance, 2) - 2 * ball.m_distance * opposingGoal.m_distance * Math.cos(Math.abs(ball.m_direction - opposingGoal.m_direction)));
-            if (distance > 75.0) {
+            double angle_rads = (Math.abs(ball.m_direction - opposingGoal.m_direction) * Math.PI) / 180.0;
+            double distance = Math.sqrt(Math.pow(ball.m_distance, 2) + Math.pow(opposingGoal.m_distance, 2) - 2.0 * ball.m_distance * opposingGoal.m_distance * Math.cos(angle_rads));
+            if (distance > 60.0) {
                 currentPerceptions.add(Belief.BALL_ON_OWN_SIDE);
             }
         }
@@ -269,25 +271,28 @@ class Brain extends Thread implements SensorInput
                 for (ObjectInfo currentPlayer : players) {
                     PlayerInfo player = (PlayerInfo) currentPlayer;
                     if(player.m_teamName.equals(m_team)){
-                        
+
                         if(!currentPerceptions.contains(Belief.TEAMMATE_AVAILABLE)){
                             currentPerceptions.add(Belief.TEAMMATE_AVAILABLE);
                             this.enviromentObjects[3] = player;
                         }
-                        shortestBallDistance = Math.sqrt(Math.pow(ballDistance, 2) + Math.pow(player.m_distance, 2) - 2 * ballDistance * player.m_distance * Math.cos(Math.abs(ballDirection - player.m_direction)));
+                        double angle_rads = (Math.abs(ballDirection - player.m_direction) * Math.PI) / 180.0;
+                        shortestBallDistance = Math.sqrt(Math.pow(ballDistance, 2) + Math.pow(player.m_distance, 2) - 2 * ballDistance * player.m_distance * Math.cos(angle_rads));
+                        if(shortestBallDistance < ballDistance){
+                            // TODO: BUGFIX @Jon or @Hari? // MAYBE SOLVED? by @Michael and @James
+                            // This is true for teammates and oppoenets.
+                            currentPerceptions.add(Belief.TEAMMATE_CLOSER_TO_BALL);
+                            if(shortestBallDistance < 0.75){
+                                currentPerceptions.add(Belief.TEAMMATE_AT_BALL);
+                            }
+                        }else{
+                            currentPerceptions.add(Belief.CLOSEST_TO_BALL);
+                        }
                     }else{
                         if(player.m_distance < 0.5 && ball.m_distance < 0.75){
                             this.enviromentObjects[4] = player;
                             currentPerceptions.add(Belief.ENEMY_AT_BALL);
                         }
-                    }
-                    if(shortestBallDistance < ballDistance){
-                        currentPerceptions.add(Belief.TEAMMATE_CLOSER_TO_BALL);
-                        if(shortestBallDistance < 0.75){
-                            currentPerceptions.add(Belief.TEAMMATE_AT_BALL);    
-                        }
-                    }else{
-                        currentPerceptions.add(Belief.CLOSEST_TO_BALL);    
                     }
                 }
             }
@@ -298,13 +303,13 @@ class Brain extends Thread implements SensorInput
         return currentPerceptions;
     }
 
-    
+
     /**
     *   This function takes in the BDI Agents current intent and sends an
     *   action to krislet for the player to perform on the server.
     */
     public void performIntent(Intent intent) {
-        
+
 
 		BallInfo ball = (BallInfo) enviromentObjects[0];
         GoalInfo ownGoal = (GoalInfo) enviromentObjects[1];;
@@ -327,11 +332,11 @@ class Brain extends Thread implements SensorInput
                     m_krislet.kick(75,0);
                     break;
                 case LOOK_LEFT:
-                    m_krislet.turn(-70);
+                    m_krislet.turn(-80);
                     m_memory.waitForNewInfo();
                     break;
                 case LOOK_RIGHT:
-                    m_krislet.turn(70);
+                    m_krislet.turn(80);
                     m_memory.waitForNewInfo();
                     break;
                 case TURN_TO_BALL:
@@ -387,12 +392,12 @@ class Brain extends Thread implements SensorInput
     {
         // Establish Agent
         JasonAgent agent = new JasonAgent(this.m_agent_asl);
-
+        System.out.println("BDI Agent Loaded: Begining new game of RoboCup");
 
 
     	// first put it somewhere on my side
     	if(Pattern.matches("^before_kick_off.*",m_playMode))
-    	    m_krislet.move( -Math.random()*52.5 , 34 - Math.random()*68.0 );
+    	    m_krislet.move( -Math.random()*52.5 , Math.random()*40.0 );
 
     	while( !m_timeOver ){
     		// sleep one step to ensure that we will not send
@@ -404,14 +409,15 @@ class Brain extends Thread implements SensorInput
 
             // Get current perceptions
             perceptions = this.getPerceptions();
-            System.out.println(perceptions.toString());
+
             //for (ObjectInfo currentPlayer : players) {
             // Get an intent from the Jason Agent based on this cycles new
             // current perceptions so we can perform an action
-            System.out.println("before");
+            System.out.println("Starting Reasoning:");
+            System.out.println(perceptions.toString());
             Intent intent = agent.getIntent(perceptions);
 
-            System.out.println("after");
+            System.out.println("Got Intent:");
             System.out.println(intent.toString());
             // Perform the action
             this.performIntent(intent);

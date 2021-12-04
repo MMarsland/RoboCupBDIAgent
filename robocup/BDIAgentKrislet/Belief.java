@@ -22,11 +22,11 @@ public enum Belief {
     TEAMMATE_CLOSER_TO_BALL,
     AT_BALL,
     ENEMY_AT_BALL,
-    
+
     AT_OWN_NET,
     AT_OPPOSING_NET,
     ON_OWN_SIDE,
-    
+
     BALL_ON_OWN_SIDE,
     BALL_MED_DIST_FROM_GOALIE,
     FACING_OWN_GOAL,

@@ -1,1 +1,1 @@
-javac Krislet.java
+javac --release 15 *.java

@@ -1,4 +1,4 @@
-start java Krislet -team Blue
+java Krislet -team Blue
 
 
 
