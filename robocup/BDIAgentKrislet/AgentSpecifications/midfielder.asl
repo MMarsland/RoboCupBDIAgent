@@ -94,9 +94,7 @@
     : ball_to_right
     <- -ball_was_left.
 
-+!remeberballdirection
-    : true
-    <- +waited.
++!remeberballdirection.
 
 +!remebergoaldirection
     : enemy_goal_to_left
@@ -106,6 +104,4 @@
     : enemy_goal_to_right
     <- -enemy_goal_was_left.
 
-+!remebergoaldirection
-    : true
-    <- +waited.
++!remebergoaldirection.
