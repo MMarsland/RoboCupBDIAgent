@@ -2,3 +2,4 @@ out
 robocup/BDIAgentKrislet/*.class
 *.rcg
 *.rcl
+.idea

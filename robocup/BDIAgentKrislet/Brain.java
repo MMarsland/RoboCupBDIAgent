@@ -74,7 +74,7 @@ class Brain extends Thread implements SensorInput
         FlagInfo goalie_line_c;
         FlagInfo goalie_line_b;
         FlagInfo goalie_line_t;
-                
+
         if(centre_c != null){
             System.out.println("Flag c: " + centre_c.getDistance());
         }
@@ -146,7 +146,7 @@ class Brain extends Thread implements SensorInput
 
         if(centre_t != null ){
             double distance = Math.cos(Math.toRadians(centre_t.m_direction)) * centre_t.m_distance;
-            if(distance < 1){
+            if(distance < 3){
                 closeToCentre = true;
             }else{
                 farFromCentre = true;
@@ -154,16 +154,16 @@ class Brain extends Thread implements SensorInput
         }
         if(centre_b != null ){
             double distance = Math.cos(Math.toRadians(centre_b.m_direction)) * centre_b.m_distance;
-            if(distance < 1){
+            if(distance < 3){
                 closeToCentre = true;
             }else{
                 farFromCentre = true;
             }
         }
-        
+
         if(centre_c != null){
             double distance = Math.cos(Math.toRadians(centre_c.m_direction)) * centre_c.m_distance;
-            if(distance < 1){
+            if(distance < 3){
                 closeToCentre = true;
             }else{
                 farFromCentre = true;
@@ -231,7 +231,7 @@ class Brain extends Thread implements SensorInput
                 farFromGoalLine = true;
             }
         }
-        
+
         if(goalie_line_c != null){
             double distance = Math.cos(Math.toRadians(goalie_line_c.m_direction)) * goalie_line_c.m_distance;
             if(distance < 1){
@@ -240,7 +240,7 @@ class Brain extends Thread implements SensorInput
                 farFromGoalLine = true;
             }
         }
-        
+
         if(closeToGoalLine){
             currentPerceptions.add(Belief.GOAL_LINE_SEEN);
             currentPerceptions.add(Belief.CLOSE_TO_GOAL_LINE);
@@ -270,7 +270,7 @@ class Brain extends Thread implements SensorInput
                 double shortestBallDistance = 0;
                 for (ObjectInfo currentPlayer : players) {
                     PlayerInfo player = (PlayerInfo) currentPlayer;
-                    
+
                     if(player.m_teamName.equals(m_team)){
 
                         if(!currentPerceptions.contains(Belief.TEAMMATE_AVAILABLE)){
@@ -280,8 +280,6 @@ class Brain extends Thread implements SensorInput
                         double angle_rads = (Math.abs(ballDirection - player.m_direction) * Math.PI) / 180.0;
                         shortestBallDistance = Math.sqrt(Math.pow(ballDistance, 2) + Math.pow(player.m_distance, 2) - 2 * ballDistance * player.m_distance * Math.cos(angle_rads));
                         if(shortestBallDistance < ballDistance){
-                            // TODO: BUGFIX @Jon or @Hari? // MAYBE SOLVED? by @Michael and @James
-                            // This is true for teammates and oppoenets.
                             currentPerceptions.add(Belief.TEAMMATE_CLOSER_TO_BALL);
                             if(shortestBallDistance < 0.75){
                                 currentPerceptions.add(Belief.TEAMMATE_AT_BALL);
@@ -375,8 +373,14 @@ class Brain extends Thread implements SensorInput
                 case RUN_TO_OPPOSING_GOAL:
                     m_krislet.dash(100*opposingGoal.m_distance);
                     break;
+                case RUN_TO_CENTRE:
+                    m_krislet.dash(100);
+                    break;
+                case WAIT:
+                    m_memory.waitForNewInfo();
+                    break;
                 default:
-                    System.out.println("DEFAULT INTENT (WAITING)");
+                System.out.printf("UNKNOWN INTENT (%s) - WAITING", intent);
                     m_memory.waitForNewInfo();
                     break;
             }
