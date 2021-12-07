@@ -194,6 +194,8 @@ class Brain extends Thread implements SensorInput
             double distance = Math.sqrt(Math.pow(ball.m_distance, 2) + Math.pow(ownGoal.m_distance, 2) - 2.0 * ball.m_distance * ownGoal.m_distance * Math.cos(angle_rads));
             if (distance < 50.0) {
                 currentPerceptions.add(Belief.BALL_ON_OWN_SIDE);
+            } else {
+                currentPerceptions.add(Belief.BALL_ON_ENEMY_SIDE);
             }
         }
         else if (ball != null && opposingGoal != null) {
@@ -201,6 +203,8 @@ class Brain extends Thread implements SensorInput
             double distance = Math.sqrt(Math.pow(ball.m_distance, 2) + Math.pow(opposingGoal.m_distance, 2) - 2.0 * ball.m_distance * opposingGoal.m_distance * Math.cos(angle_rads));
             if (distance > 60.0) {
                 currentPerceptions.add(Belief.BALL_ON_OWN_SIDE);
+            } else {
+                currentPerceptions.add(Belief.BALL_ON_ENEMY_SIDE);
             }
         }
 
@@ -258,11 +262,6 @@ class Brain extends Thread implements SensorInput
         PlayerInfo enemy =  (PlayerInfo) environmentObjects[4];
         FlagInfo centre = (FlagInfo) environmentObjects[5];
         FlagInfo ownPenalty = (FlagInfo) environmentObjects[6];
-
-        if (ball != null) {
-            System.out.println("Ball Distance: "+ball.getDistance());
-        }
-
 
         try {
             switch(intent){

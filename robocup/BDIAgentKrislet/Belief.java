@@ -28,6 +28,7 @@ public enum Belief {
     ON_OWN_SIDE,
 
     BALL_ON_OWN_SIDE,
+    BALL_ON_ENEMY_SIDE,
     BALL_MED_DIST_FROM_GOALIE,
     FACING_OWN_GOAL,
 
