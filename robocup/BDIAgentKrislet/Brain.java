@@ -38,7 +38,7 @@ class Brain extends Thread implements SensorInput
     private char m_side;
 	private String m_agent_asl;
     private List<Belief> perceptions;
-    private ObjectInfo[] enviromentObjects;
+    private ObjectInfo[] environmentObjects;
 
 
 	//---------------------------------------------------------------------------
@@ -55,7 +55,7 @@ class Brain extends Thread implements SensorInput
     	m_playMode = playMode;
     	start();
         perceptions = new LinkedList<Belief>();
-        enviromentObjects = new ObjectInfo[5];
+        environmentObjects = new ObjectInfo[7];
     }
 
     /**
@@ -69,56 +69,38 @@ class Brain extends Thread implements SensorInput
         GoalInfo ownGoal;
         GoalInfo opposingGoal;
         FlagInfo centre_c = (FlagInfo) m_memory.getObject("flag c");
-        FlagInfo centre_t = (FlagInfo) m_memory.getObject("flag t");
-        FlagInfo centre_b = (FlagInfo) m_memory.getObject("flag b");
-        FlagInfo goalie_line_c;
-        FlagInfo goalie_line_b;
-        FlagInfo goalie_line_t;
+        FlagInfo ownPenalty_c;
 
         if(centre_c != null){
             System.out.println("Flag c: " + centre_c.getDistance());
-        }
-        if(centre_t != null){
-            System.out.println("Flag t: " + centre_t.getDistance());
-        }
-        if(centre_b != null){
-            System.out.println("Line B: " + centre_b.getDistance());
         }
 
         if(this.m_side == 'r'){
             ownGoal = (GoalInfo) m_memory.getObject("goal r");
             opposingGoal = (GoalInfo) m_memory.getObject("goal l");
-            goalie_line_c = (FlagInfo) m_memory.getObject("flag p r c");
-            goalie_line_b = (FlagInfo) m_memory.getObject("flag p r b");
-            goalie_line_t = (FlagInfo) m_memory.getObject("flag p r t");
+            ownPenalty_c = (FlagInfo) m_memory.getObject("flag p r c");
 
         }else{
             ownGoal = (GoalInfo) m_memory.getObject("goal l");
             opposingGoal = (GoalInfo) m_memory.getObject("goal r");
-            goalie_line_c = (FlagInfo) m_memory.getObject("flag p l c");
-            goalie_line_b = (FlagInfo) m_memory.getObject("flag p l b");
-            goalie_line_t = (FlagInfo) m_memory.getObject("flag p l t");
+            ownPenalty_c = (FlagInfo) m_memory.getObject("flag p l c");
         }
 
-        this.enviromentObjects[0] = ball;
-        this.enviromentObjects[1] = ownGoal;
-        this.enviromentObjects[2] = opposingGoal;
+        this.environmentObjects[0] = ball;
+        this.environmentObjects[1] = ownGoal;
+        this.environmentObjects[2] = opposingGoal;
+        this.environmentObjects[5] = centre_c;
+        this.environmentObjects[6] = ownPenalty_c;
 
 
 
 		List<ObjectInfo> players = m_memory.getObjects("player");
         List<Belief> previousPerceptions = perceptions;
         List<Belief> currentPerceptions = new LinkedList<Belief>();
-        // TEMP: Descitizing code goes here to translate the current Environment
+        // Descitizing code goes here to translate the current Environment
         // state into a list of Perceptions for the agent, these
 
-        //TODO-?: Are we using hard negation? Can we remove beliefs if they are
-        // not present in the perceptions? How do we establish this in Jason?
-        if( ball == null ){
-            //if(previousPerceptions.contains(Belief.BALL_SEEN)){
-               //currentPerceptions.add(Belief.BALL_WENT_PAST);
-            //}
-        }else{
+        if( ball != null ) {
             currentPerceptions.add(Belief.BALL_SEEN);
             if( ball.m_distance < 0.75) {
                 currentPerceptions.add(Belief.AT_BALL);
@@ -130,7 +112,7 @@ class Brain extends Thread implements SensorInput
 
             if(ball.m_direction < 0) {
                 currentPerceptions.add(Belief.BALL_TO_LEFT);
-            }else{
+            } else {
                 currentPerceptions.add(Belief.BALL_TO_RIGHT);
             }
 
@@ -140,42 +122,21 @@ class Brain extends Thread implements SensorInput
             }
         }
 
-        // Assume you can't see any of the centre flags
-        boolean closeToCentre = false;
-        boolean farFromCentre = false;
-
-        if(centre_t != null ){
-            double distance = Math.cos(Math.toRadians(centre_t.m_direction)) * centre_t.m_distance;
-            if(distance < 3){
-                closeToCentre = true;
-            }else{
-                farFromCentre = true;
-            }
-        }
-        if(centre_b != null ){
-            double distance = Math.cos(Math.toRadians(centre_b.m_direction)) * centre_b.m_distance;
-            if(distance < 3){
-                closeToCentre = true;
-            }else{
-                farFromCentre = true;
-            }
-        }
-
         if(centre_c != null){
-            double distance = Math.cos(Math.toRadians(centre_c.m_direction)) * centre_c.m_distance;
-            if(distance < 3){
-                closeToCentre = true;
-            }else{
-                farFromCentre = true;
+            currentPerceptions.add(Belief.CENTRE_SEEN);
+            if(Math.abs(centre_c.m_direction) < 10) {
+                currentPerceptions.add(Belief.FACING_CENTRE);
             }
-        }
 
-        // If the agent is close to any of the flags, add CLOSE_TO_CENTRE else only add CENTRE_LINE_SEEN
-        if(closeToCentre){
-            currentPerceptions.add(Belief.CENTRE_LINE_SEEN);
-            currentPerceptions.add(Belief.CLOSE_TO_CENTRE);
-        }else if(farFromCentre){
-            currentPerceptions.add(Belief.CENTRE_LINE_SEEN);
+            if(centre_c.m_direction < 0) {
+                currentPerceptions.add(Belief.CENTRE_TO_LEFT);
+            }else{
+                currentPerceptions.add(Belief.CENTRE_TO_RIGHT);
+            }
+
+            if(centre_c.m_distance < 3){
+                currentPerceptions.add(Belief.CLOSE_TO_CENTRE);
+            }
         }
 
         if(ownGoal == null && opposingGoal == null){
@@ -211,41 +172,21 @@ class Brain extends Thread implements SensorInput
             }
         }
 
-        // Assume goal line cannot be seen
-        boolean closeToGoalLine = false;
-        boolean farFromGoalLine = false;
-
-        if(goalie_line_t != null ){
-            double distance = Math.cos(Math.toRadians(goalie_line_t.m_direction)) * goalie_line_t.m_distance;
-            if(distance < 1){
-                closeToGoalLine = true;
-            }else{
-                farFromGoalLine = true;
+        if(ownPenalty_c != null){
+            currentPerceptions.add(Belief.OWN_PENALTY_SEEN);
+            if(Math.abs(ownPenalty_c.getDirection()) < 10) {
+                currentPerceptions.add(Belief.FACING_OWN_PENALTY);
             }
-        }
-        if(goalie_line_b != null ){
-            double distance = Math.cos(Math.toRadians(goalie_line_b.m_direction)) * goalie_line_b.m_distance;
-            if(distance < 1){
-                closeToGoalLine = true;
-            }else{
-                farFromGoalLine = true;
-            }
-        }
 
-        if(goalie_line_c != null){
-            double distance = Math.cos(Math.toRadians(goalie_line_c.m_direction)) * goalie_line_c.m_distance;
-            if(distance < 1){
-                closeToGoalLine = true;
+            if(ownPenalty_c.getDirection() < 0) {
+                currentPerceptions.add(Belief.OWN_PENALTY_TO_LEFT);
             }else{
-                farFromGoalLine = true;
+                currentPerceptions.add(Belief.OWN_PENALTY_TO_RIGHT);
             }
-        }
 
-        if(closeToGoalLine){
-            currentPerceptions.add(Belief.GOAL_LINE_SEEN);
-            currentPerceptions.add(Belief.CLOSE_TO_GOAL_LINE);
-        }else if(farFromGoalLine){
-            currentPerceptions.add(Belief.GOAL_LINE_SEEN);
+            if(ownPenalty_c.getDistance() < 3){
+                currentPerceptions.add(Belief.CLOSE_TO_OWN_PENALTY);
+            }
         }
 
         if (ball != null && ownGoal != null) {
@@ -275,7 +216,7 @@ class Brain extends Thread implements SensorInput
 
                         if(!currentPerceptions.contains(Belief.TEAMMATE_AVAILABLE)){
                             currentPerceptions.add(Belief.TEAMMATE_AVAILABLE);
-                            this.enviromentObjects[3] = player;
+                            this.environmentObjects[3] = player;
                         }
                         double angle_rads = (Math.abs(ballDirection - player.m_direction) * Math.PI) / 180.0;
                         shortestBallDistance = Math.sqrt(Math.pow(ballDistance, 2) + Math.pow(player.m_distance, 2) - 2 * ballDistance * player.m_distance * Math.cos(angle_rads));
@@ -289,7 +230,7 @@ class Brain extends Thread implements SensorInput
                         }
                     }else{
                         if(player.m_distance < 2 && ball.m_distance < 0.25){
-                            this.enviromentObjects[4] = player;
+                            this.environmentObjects[4] = player;
                             currentPerceptions.add(Belief.ENEMY_AT_BALL);
                         }
                     }
@@ -310,11 +251,18 @@ class Brain extends Thread implements SensorInput
     public void performIntent(Intent intent) {
 
 
-		BallInfo ball = (BallInfo) enviromentObjects[0];
-        GoalInfo ownGoal = (GoalInfo) enviromentObjects[1];;
-        GoalInfo opposingGoal = (GoalInfo) enviromentObjects[2];;
-        PlayerInfo player = (PlayerInfo) enviromentObjects[3];
-        PlayerInfo enemy =  (PlayerInfo) enviromentObjects[4];
+		BallInfo ball = (BallInfo) environmentObjects[0];
+        GoalInfo ownGoal = (GoalInfo) environmentObjects[1];;
+        GoalInfo opposingGoal = (GoalInfo) environmentObjects[2];;
+        PlayerInfo player = (PlayerInfo) environmentObjects[3];
+        PlayerInfo enemy =  (PlayerInfo) environmentObjects[4];
+        FlagInfo centre = (FlagInfo) environmentObjects[5];
+        FlagInfo ownPenalty = (FlagInfo) environmentObjects[6];
+
+        if (ball != null) {
+            System.out.println("Ball Distance: "+ball.getDistance());
+        }
+
 
         try {
             switch(intent){
@@ -345,7 +293,7 @@ class Brain extends Thread implements SensorInput
                     m_memory.waitForNewInfo();
                     break;
                 case TURN_TO_BALL:
-                    m_krislet.turn(ball.m_direction);
+                    m_krislet.turn(ball.getDirection());
                     m_memory.waitForNewInfo();
                     break;
                 case TURN_TO_OWN_GOAL:
@@ -357,24 +305,33 @@ class Brain extends Thread implements SensorInput
                 case TURN_TO_PLAYER:
                     m_krislet.turn(player.getDirection());
                     break;
+                case TURN_TO_CENTRE:
+                    m_krislet.turn(centre.getDirection());
+                    break;
+                case TURN_TO_OWN_PENALTY:
+                    m_krislet.turn(ownPenalty.getDirection());
+                    break;
                 case RUN_TO_PLAYER:
-                    m_krislet.dash(100*player.m_distance);
+                    m_krislet.dash(100*player.getDistance());
                     break;
                 case RUN_TO_BALL:
-                    if(ball.m_distance > 5){
+                    if(ball.getDistance() > 5){
                         m_krislet.dash(50);
                     }else{
-                        m_krislet.dash(100*ball.m_distance);
+                        m_krislet.dash(50*ball.getDistance());
                     }
                     break;
                 case RUN_TO_OWN_GOAL:
-                    m_krislet.dash(100*ownGoal.m_distance);
+                    m_krislet.dash(100*ownGoal.getDistance());
                     break;
                 case RUN_TO_OPPOSING_GOAL:
-                    m_krislet.dash(100*opposingGoal.m_distance);
+                    m_krislet.dash(100*opposingGoal.getDistance());
                     break;
                 case RUN_TO_CENTRE:
-                    m_krislet.dash(100);
+                    m_krislet.dash(100*centre.getDistance());
+                    break;
+                case RUN_TO_OWN_PENALTY:
+                    m_krislet.dash(100*ownPenalty.getDistance());
                     break;
                 case WAIT:
                     m_memory.waitForNewInfo();

@@ -13,25 +13,35 @@
 +!findball
     : ball_seen & teammate_closer_to_ball
     <- !remeberballdirection;
+       !remebergoaldirection;
+       !remebercentredirection;
        !movetomid.
 
 +!findball
     : ball_seen & not teammate_closer_to_ball
     <- !remeberballdirection;
+       !remebergoaldirection;
+       !remebercentredirection;
        !gotoball.
 
 +!movetomid
-    :   close_to_centre
-    <-  wait;
+    :   close_to_centre | was_close_to_centre
+    <-  +was_close_to_centre;
+        wait;
         !findball.
 
 +!movetomid
-   :    not close_to_centre & not centre_line_seen
+   :    not close_to_centre & not centre_seen
    <-   look_left;
         !movetomid.
 
 +!movetomid
-   :    not close_to_centre & centre_line_seen
+   :    not close_to_centre & centre_seen & not facing_centre
+   <-   turn_to_centre;
+        !movetomid.
+
++!movetomid
+   :    not close_to_centre & centre_seen & facing_centre
    <-   run_to_centre;
         !findball.
 
@@ -42,13 +52,18 @@
 +!gotoball
     :   not at_ball & ball_seen & not facing_ball
     <-  turn_to_ball;
+        !remeberballdirection;
         !remebergoaldirection;
+        !remebercentredirection;
         !gotoball.
 
 +!gotoball
     :   not at_ball & ball_seen & facing_ball
-    <-  run_to_ball;
+    <-  -was_close_to_centre;
+        run_to_ball;
+        !remeberballdirection;
         !remebergoaldirection;
+        !remebercentredirection;
         !findball.
 
 +!gotoball
@@ -84,7 +99,15 @@
 
 
 
++!remebercentredirection
+    : centre_to_left
+    <- +centre_was_left.
 
++!remebercentredirection
+    : centre_to_right
+    <- -centre_was_left.
+
++!remebercentredirection.
 
 +!remeberballdirection
     : ball_to_left
