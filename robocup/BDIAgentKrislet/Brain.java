@@ -68,6 +68,7 @@ class Brain extends Thread implements SensorInput
 
         GoalInfo ownGoal;
         GoalInfo opposingGoal;
+        LineInfo ownSideLine;
         FlagInfo centre_c = (FlagInfo) m_memory.getObject("flag c");
         FlagInfo ownPenalty_c;
 
@@ -79,11 +80,12 @@ class Brain extends Thread implements SensorInput
             ownGoal = (GoalInfo) m_memory.getObject("goal r");
             opposingGoal = (GoalInfo) m_memory.getObject("goal l");
             ownPenalty_c = (FlagInfo) m_memory.getObject("flag p r c");
-
+            ownSideLine = (LineInfo) m_memory.getObject("line r");
         }else{
             ownGoal = (GoalInfo) m_memory.getObject("goal l");
             opposingGoal = (GoalInfo) m_memory.getObject("goal r");
             ownPenalty_c = (FlagInfo) m_memory.getObject("flag p l c");
+            ownSideLine = (LineInfo) m_memory.getObject("line l");
         }
 
         this.environmentObjects[0] = ball;
@@ -120,6 +122,14 @@ class Brain extends Thread implements SensorInput
             if(ball.m_distance < 25){
                 currentPerceptions.add(Belief.BALL_MED_DIST_FROM_GOALIE);
             }
+        }
+
+        if(ownSideLine != null){
+            currentPerceptions.add(Belief.SAME_GOAL_LINE_SEEN);
+            if(ownSideLine.m_distance < 10){
+                currentPerceptions.add(Belief.CLOSE_TO_SAME_GOAL_LINE);
+            }
+
         }
 
         if(centre_c != null){
