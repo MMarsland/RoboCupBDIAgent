@@ -1,6 +1,12 @@
 /*Run to own goal or perhaps initilize the goalie at own goal at start*/
 !goToOwnGoal.
 
+/* used for unit testing */
++!goToOwnGoal
+    :ball_seen & at_ball & enemy_goal_seen & testing
+    <-  kick_at_net.
+
+
 // If the goalie cant see their own goal, search for the goal
 +!goToOwnGoal
     :   not own_goal_seen
@@ -95,3 +101,4 @@
     :   not ball_seen
     <-  look_right;
         !findball.
+

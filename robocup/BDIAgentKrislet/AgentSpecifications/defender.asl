@@ -1,6 +1,14 @@
 is_on_own_side.
 !defend.
 
+/* used for unit testing */
++!defend
+    :ball_seen & at_ball & enemy_goal_seen & testing
+    <-  kick_at_net.
+
+
+
+
 +!defend
     :   not is_on_own_side
     <-  !movetoownside.
@@ -189,3 +197,5 @@ is_on_own_side.
 +!findoppgoal
     :   enemy_goal_seen & not was_at_ball
     <-  !movetoball.
+
+

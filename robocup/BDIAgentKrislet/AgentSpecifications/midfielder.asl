@@ -1,5 +1,10 @@
 !findball.
 
+/* used for unit testing */
++!findball
+    :ball_seen & at_ball & enemy_goal_seen & testing
+    <-  kick_at_net.
+
 +!findball
     :   not ball_seen & ball_was_left
     <-  look_left;
@@ -128,3 +133,5 @@
     <- -enemy_goal_was_left.
 
 +!remebergoaldirection.
+
+

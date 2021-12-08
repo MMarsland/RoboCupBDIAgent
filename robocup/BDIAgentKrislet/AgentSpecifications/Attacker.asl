@@ -1,6 +1,12 @@
 /*Start by always trying to find the ball */
 !findball.
 
+
+/* used for unit testing */
++!findball
+    :ball_seen & at_ball & enemy_goal_seen & testing
+    <-  kick_at_net.
+
 /* If a teammate is closer to the ball, and the team is attacking, run to the enemy net */
 +!findball
     :   teammate_closer_to_ball & enemy_goal_seen & not ball_on_own_side
@@ -114,3 +120,4 @@
 +!findoppgoal
     :   not at_ball
     <-  !findball.
+
