@@ -10,7 +10,7 @@ is_on_own_side.
     <-  !movetoball.
 
 +!defend
-    :   not was_at_own_goal & not ball_on_own_side & not teammate_closer_to_ball 
+    :   not was_close_to_own_penalty & not ball_on_own_side & not teammate_closer_to_ball 
     <-  !movetoowngoal.
 
 +!defend
@@ -41,23 +41,23 @@ is_on_own_side.
 
 
 +!movetoowngoal
-    :   not own_goal_seen
+    :   not own_penalty_seen
     <-  look_right;
         !movetoowngoal.
 
 +!movetoowngoal
-    :   own_goal_seen & not facing_own_goal & not at_own_net & not ball_on_own_side
-    <-  turn_to_own_goal;
+    :   own_penalty_seen & not own_penalty_seen & not close_to_own_penalty & not ball_on_own_side
+    <-  turn_to_own_penalty;
 		!movetoowngoal.
 
 +!movetoowngoal
-    :   own_goal_seen & facing_own_goal & not at_own_net & not ball_on_own_side
-    <-  run_to_own_goal;
+    :   own_penalty_seen & own_penalty_seen & not close_to_own_penalty & not ball_on_own_side
+    <-  run_to_own_penalty;
 		!movetoowngoal.
 
 +!movetoowngoal
-    :   at_own_net
-    <-  +was_at_own_goal;
+    :   close_to_own_penalty
+    <-  +was_close_to_own_penalty;
         !findball.
 
 +!movetoowngoal
@@ -101,8 +101,6 @@ is_on_own_side.
 
 
 
-
-
 +!findballside
     :   ball_seen & ball_on_own_side
     <-  +ball_was_on_own_side;
@@ -125,6 +123,10 @@ is_on_own_side.
         !kick.
 
 +!movetoball
+    :   not ball_was_on_own_side | not is_on_own_side
+    <-  !defend.
+
++!movetoball
     :   (not ball_seen | not facing_ball) & not at_ball
     <-  !findball.
 
@@ -132,32 +134,30 @@ is_on_own_side.
     :   ball_seen & facing_ball & enemy_goal_to_left & ball_was_on_own_side & not at_ball & not was_at_ball
     <-  run_to_ball;
         +enemy_goal_was_left;
-        -was_at_own_goal;
+        -was_close_to_own_penalty;
         !movetoball.
 
 +!movetoball
     :   ball_seen & facing_ball & enemy_goal_to_right & ball_was_on_own_side & not at_ball & not was_at_ball
     <-  run_to_ball;
         -enemy_goal_was_left;
-        -was_at_own_goal;
+        -was_close_to_own_penalty;
         !movetoball.
 
 +!movetoball
     :   ball_seen & facing_ball & ball_was_on_own_side & not at_ball & not was_at_ball
     <-  run_to_ball;
-        -was_at_own_goal;
+        -was_close_to_own_penalty;
         !movetoball.
 
-+!movetoball
-    :   not ball_was_on_own_side
-    <-  !defend.
+
 
 +!kick
     :   not was_at_ball
     <-  !movetoball.
 
 +!kick
-    :   was_at_ball & not enemy_goal_seen
+    :   was_at_ball & (own_penalty_seen | own_goal_seen)
     <-  kick_to_defend;
         -was_at_ball;
         !defend.

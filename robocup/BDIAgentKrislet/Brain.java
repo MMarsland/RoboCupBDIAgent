@@ -125,9 +125,9 @@ class Brain extends Thread implements SensorInput
         }
 
         if(ownSideLine != null){
-            currentPerceptions.add(Belief.SAME_GOAL_LINE_SEEN);
+            currentPerceptions.add(Belief.OWN_GOAL_LINE_SEEN);
             if(ownSideLine.m_distance < 10){
-                currentPerceptions.add(Belief.CLOSE_TO_SAME_GOAL_LINE);
+                currentPerceptions.add(Belief.CLOSE_TO_OWN_GOAL_LINE);
             }
 
         }
