@@ -291,7 +291,7 @@ class Brain extends Thread implements SensorInput
                     m_krislet.turn(45);
                     break;
                 case KICK_STRAIGHT:
-                    m_krislet.kick(75,0);
+                    m_krislet.kick(25,0);
                     break;
                 case LOOK_LEFT:
                     m_krislet.turn(-80);
@@ -378,7 +378,7 @@ class Brain extends Thread implements SensorInput
 
     	// first put it somewhere on my side
     	if(Pattern.matches("^before_kick_off.*",m_playMode))
-    	    m_krislet.move( -Math.random()*20.5 , Math.random()*30.0 );
+    	   move();
 
     	while( !m_timeOver ){
     		// sleep one step to ensure that we will not send
@@ -408,6 +408,25 @@ class Brain extends Thread implements SensorInput
     }
 
 
+    public void move(){
+
+        if(m_agent_asl.equals("AgentSpecifications/defender.asl")){
+            m_krislet.move( -34 , 0 );
+        }else if(m_agent_asl.equals("AgentSpecifications/goalie.asl")){
+            m_krislet.move( -51 , 0 );
+        }else if(m_agent_asl.equals("AgentSpecifications/centreback.asl")){
+            m_krislet.move( -25 , Math.random() * 5 -2.5);
+        }else if(m_agent_asl.equals("AgentSpecifications/midfielder.asl")){
+            m_krislet.move( -15 , Math.random() * 5 -2.5);
+        }else if(m_agent_asl.equals("AgentSpecifications/attacker.asl")){
+            m_krislet.move( -5 , Math.random() * 5 -2.5);
+        }else{
+            m_krislet.move( -Math.random()*20.5 , Math.random()*30.0 );
+        }
+
+    }
+
+
     //===========================================================================
     // Here are suporting functions for implement logic
 
@@ -427,6 +446,17 @@ class Brain extends Thread implements SensorInput
     // This function receives hear information from player
     public void hear(int time, int direction, String message)
     {
+        if(m_side == 'l'){
+            if(message == "goal_r"){
+                move();
+            }
+        }else{
+            if(message == "goal_l"){
+                move();
+            }
+        }
+        
+
     }
 
     //---------------------------------------------------------------------------
