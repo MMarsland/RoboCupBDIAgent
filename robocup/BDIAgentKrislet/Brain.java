@@ -243,9 +243,13 @@ class Brain extends Thread implements SensorInput
                             currentPerceptions.add(Belief.CLOSEST_TO_BALL);
                         }
                     }else{
-                        if(player.m_distance < 2 && ball.m_distance < 0.25){
+                        if(player.m_distance < 2 && ball.m_distance < 0.5){
                             this.environmentObjects[4] = player;
                             currentPerceptions.add(Belief.ENEMY_AT_BALL);
+                        }
+                        if(Math.abs(player.m_direction) < 5 && player.m_distance < 10){
+                            this.environmentObjects[4] = player;
+                            currentPerceptions.add(Belief.ENEMY_BLOCKING_SHOT);
                         }
                     }
                 }
@@ -285,9 +289,7 @@ class Brain extends Thread implements SensorInput
                     m_krislet.kick(75, 180);
                     break;
                 case KICK_TO_SIDE:
-                    System.out.println(perceptions.toString());
-                    System.out.println("Kicking to side");
-                    m_krislet.kick(10, enemy.m_direction + 35);
+                    m_krislet.kick(75, enemy.m_direction + 35);
                     m_krislet.turn(45);
                     break;
                 case KICK_STRAIGHT:

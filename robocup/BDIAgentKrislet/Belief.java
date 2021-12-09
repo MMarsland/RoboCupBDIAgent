@@ -22,6 +22,7 @@ public enum Belief {
     TEAMMATE_CLOSER_TO_BALL,
     AT_BALL,
     ENEMY_AT_BALL,
+    ENEMY_BLOCKING_SHOT,
 
     AT_OWN_NET,
     AT_OPPOSING_NET,

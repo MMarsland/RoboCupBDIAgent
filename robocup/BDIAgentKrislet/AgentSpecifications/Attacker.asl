@@ -27,14 +27,14 @@
         -ball_was_left
         !findball.
 
-/* If the ball is seen, but not facing the ball, turn left to the ball */
+/* If the ball is seen, but not facing the ball, turn to face the ball */
 +!findball
     :   ball_seen & not at_ball & ball_to_left
     <-  turn_to_ball;
         +ball_was_left
         !movetoball.
 
-/* If the ball is seen, but not facing the ball, turn right to the ball */
+/* If the ball is seen, but not facing the ball, turn to face the ball */
 +!findball
     :   ball_seen & not at_ball & ball_to_right
     <-  turn_to_ball;
@@ -53,23 +53,32 @@
     <-  look_right;
         !findball.
 
-/* If at the ball and an enermy is at the ball, kick the ball to the side */
 +!findball
     :   ball_seen & at_ball & enemy_at_ball
+    <-  !kick.  
+
+/* If at the ball and the enemy net is not seen, find the enemy net */
++!findball
+    :   ball_seen & at_ball & not enemy_goal_seen & not enemy_at_ball
+    <-  !findoppgoal.
+
++!findball
+    :   ball_seen & at_ball & enemy_goal_seen
+    <-  !kick.    
+
+
+/* If at the ball and an enermy is at the ball, kick the ball to the side */
++!kick
+    :   ball_seen & at_ball & ( enemy_at_ball | enemy_blocking_shot)
     <-  kick_to_side;
         !findball.                       
 
 /* If at the ball and the enemy net is seen, kick the ball at their net */
-+!findball
-    :   ball_seen & at_ball & enemy_goal_seen
++!kick
+    :   ball_seen & at_ball & enemy_goal_seen & not ( enemy_at_ball | enemy_blocking_shot)
     <-  kick_at_net;
         !findball.
 
-
-/* If at the ball and the enemy net is not seen, find the enemy net */
-+!findball
-    :   ball_seen & at_ball & not enemy_goal_seen
-    <-  !findoppgoal.
 
 /* If the ball is not found, find the ball */
 +!movetoball
@@ -112,9 +121,7 @@
 /* if the enemy goal is found, kick the ball */
 +!findoppgoal
     :   enemy_goal_seen & at_ball
-    <-  kick_at_net;
-        -at_ball;
-        !findball.
+    <-  !kick.
 
 /* if the ball hast moved, find the ball again */
 +!findoppgoal
