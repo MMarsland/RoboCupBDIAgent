@@ -14,8 +14,8 @@ REM Start a team of Jason BDI agents with different roles.
 cd ./BDIAgentKrislet
 start java -cp .;jason-2.3.jar Krislet -team BDI -asl goalie.asl
 start java -cp .;jason-2.3.jar Krislet -team BDI -asl defender.asl
-start java -cp .;jason-2.3.jar Krislet -team BDI -asl defender.asl
 start java -cp .;jason-2.3.jar Krislet -team BDI -asl midfielder.asl
+start java -cp .;jason-2.3.jar Krislet -team BDI -asl attacker.asl
 start java -cp .;jason-2.3.jar Krislet -team BDI -asl attacker.asl
 cd ..
 timeout 1

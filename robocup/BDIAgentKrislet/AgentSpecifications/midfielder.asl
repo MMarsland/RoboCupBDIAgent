@@ -5,6 +5,9 @@
     :ball_seen & at_ball & enemy_goal_seen & testing
     <-  kick_at_net.
 
+
+
+
 +!findball
     :   not ball_seen & ball_was_left
     <-  look_left;
@@ -29,15 +32,28 @@
        !remebercentredirection;
        !gotoball.
 
++!monitorball
+    : ball_seen
+    <- turn_to_ball.
+
++!monitorball
+    : not ball_seen
+    <- true.
+
 +!movetomid
     :   close_to_centre | was_close_to_centre
     <-  +was_close_to_centre;
-        wait;
+        !monitorball;
         !findball.
 
 +!movetomid
-   :    not close_to_centre & not centre_seen
+   :    not close_to_centre & not centre_seen & centre_was_left
    <-   look_left;
+        !movetomid.
+
++!movetomid
+   :    not close_to_centre & not centre_seen
+   <-   look_right;
         !movetomid.
 
 +!movetomid
@@ -133,5 +149,3 @@
     <- -enemy_goal_was_left.
 
 +!remebergoaldirection.
-
-

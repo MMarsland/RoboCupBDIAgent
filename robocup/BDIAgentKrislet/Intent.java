@@ -29,6 +29,5 @@ public enum Intent {
     RUN_TO_CENTRE,
     RUN_TO_OWN_PENALTY,
 
-    DEFEND,
     WAIT
 }
