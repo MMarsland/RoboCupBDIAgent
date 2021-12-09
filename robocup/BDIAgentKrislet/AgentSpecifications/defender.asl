@@ -115,9 +115,13 @@ is_on_own_side.
         !defend.
 
 +!findballside
-    :   ball_seen & not ball_on_own_side
+    :   ball_seen & ball_on_enemy_side
     <-  -ball_was_on_own_side;
         !defend.
+
++!findballside
+    :   ball_seen & not ball_on_own_side
+    <-  !defend.
 
 +!findballside
     :   not ball_seen
