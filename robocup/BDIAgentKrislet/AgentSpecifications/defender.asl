@@ -105,6 +105,10 @@
   <-  !findenemygoal.
 
 +!findenemygoal
+    : not at_ball
+    <- !findball.
+
++!findenemygoal
   :   not enemy_goal_seen & enemy_goal_was_left
   <-  look_left;
       !findenemygoal.
@@ -117,7 +121,6 @@
 +!findenemygoal
   :   enemy_goal_seen
   <-  !shoot.
-
 
 +!remeber
     :   true
