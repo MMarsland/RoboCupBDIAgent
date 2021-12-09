@@ -416,12 +416,10 @@ class Brain extends Thread implements SensorInput
             m_krislet.move( -34 , 0 );
         }else if(m_agent_asl.equals("AgentSpecifications/goalie.asl")){
             m_krislet.move( -51 , 0 );
-        }else if(m_agent_asl.equals("AgentSpecifications/centreback.asl")){
-            m_krislet.move( -25 , Math.random() * 5 -2.5);
         }else if(m_agent_asl.equals("AgentSpecifications/midfielder.asl")){
-            m_krislet.move( -15 , Math.random() * 5 -2.5);
+            m_krislet.move( -15 , 0);
         }else if(m_agent_asl.equals("AgentSpecifications/attacker.asl")){
-            m_krislet.move( -5 , Math.random() * 5 -2.5);
+            m_krislet.move( -5 , Math.random() * 10 - 5);
         }else{
             m_krislet.move( -Math.random()*20.5 , Math.random()*30.0 );
         }
@@ -457,7 +455,7 @@ class Brain extends Thread implements SensorInput
                 move();
             }
         }
-        
+
 
     }
 
