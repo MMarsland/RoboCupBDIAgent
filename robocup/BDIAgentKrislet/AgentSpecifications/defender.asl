@@ -1,5 +1,10 @@
 !movetopenalty.
 
+/* used for unit testing */
++!movetopenalty
+    :ball_seen & at_ball & enemy_goal_seen & testing
+    <-  kick_at_net.
+
 +!movetopenalty
     :   close_to_own_penalty | was_close_to_penalty
     <-  +was_close_to_penalty
