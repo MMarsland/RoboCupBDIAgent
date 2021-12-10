@@ -3,7 +3,9 @@
 *   the beliefs and the desires of the agent.
 *
 *   These descritized intents are converted to actions that are sent to
-*   krislet for the player to perform.
+*   Krislet for the player to perform.
+*
+*   Each of the Intents are executed as actions in the Brain class performIntent() operation.
 */
 public enum Intent {
     KICK_AT_NET,

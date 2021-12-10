@@ -81,7 +81,7 @@ class Krislet implements SendCommand
 						System.out.println("Using file: " + asl_file_name);
 					}
 					else {
-						System.out.println("Cannot find the specified ASL file: "+asl_file_name);
+						System.out.println("Cannot find the specified ASL file: " + asl_file_name);
                         throw new Exception();
 					}
 			    }

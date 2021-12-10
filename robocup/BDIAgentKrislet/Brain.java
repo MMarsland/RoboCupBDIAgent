@@ -1,16 +1,19 @@
 //
 //	File:			Brain.java
-//	Author:		Krzysztof Langner
+//	Author:         Krzysztof Langner
 //	Date:			1997/04/28
 //
-//    Modified by:	Paul Marlow
+//  Modified by:	Paul Marlow
 
-//    Modified by:      Edgar Acosta
-//    Date:             March 4, 2008
+//  Modified by:    Edgar Acosta
+//  Date:           March 4, 2008
 
 
-// Modefied By:  Hari Govindasamy, James Horner, Jon Menard, Micheal Marsland
-// Date: Decemeber 10th 2021
+//  Modefied By:    Hari Govindasamy, 
+//                  James Horner, 
+//                  Jon Menard, 
+//                  Micheal Marsland
+//  Date:           2021/12/10
 
 
 import java.lang.Math;
@@ -42,11 +45,19 @@ class Brain extends Thread implements SensorInput
     private ObjectInfo[] environmentObjects;
 
 
+	//---------------------------------------------------------------------------
+    // This constructor:
+    // - stores connection to krislet
+    // - starts thread for this object
+    // - sets which ASL file should be used for the agent
     /**
-    *   This is the constructor.
-    *    It stores a connection to krislet, as well as any information about the agent
-    *   Lastly, it startes the run thread for the agent
-    */
+     * @brief Constructor for Brain class used by Krislet.
+     * @param krislet   Krislet interface to RoboCup server.
+     * @param team      String name of the team the player is on.
+     * @param side      Char l/r side the pitch of the agents team.
+     * @param agent_asl String file name of the ASL file that the BDI agent should use.
+     * @param playMode  String for the state of play in RoboCup.
+     */
     public Brain(SendCommand krislet, String team, char side, String agent_asl, String playMode){
     	m_timeOver = false;
     	m_krislet = krislet;
@@ -61,11 +72,15 @@ class Brain extends Thread implements SensorInput
     }
 
     /**
-    *   getPerceptions takes the current environment state percieved by the player
-    *   and stored in m_memory and returns a list of descritized perceptions that
-    *   the agent will have about the current environment
-    */
+     * @brief Operation getPerceptions determines what the player can currently see and 
+     * transforms the percepts into beliefs.
+     * @details getPerceptions takes the current environment state percieved by the player
+     * and stored in m_memory and returns a list of descritized perceptions that 
+     * the agent will have about the current environment.
+     * @return List of Beliefs to add to the agents belief base.
+     */
     public List<Belief> getPerceptions() {
+        //Memory objects that will be used to identify if percepts are in the players memory.
         BallInfo ball = (BallInfo) m_memory.getObject("ball");
 
         GoalInfo ownGoal;
@@ -74,11 +89,14 @@ class Brain extends Thread implements SensorInput
         FlagInfo centre_c = (FlagInfo) m_memory.getObject("flag c");
         FlagInfo ownPenalty_c;
 
+        /*
         if(centre_c != null){
             //System.out.println("Flag c: " + centre_c.getDistance());
         }
-
-        if(this.m_side == 'r'){ // get the right objects, depending on what side you are playing on
+        */
+        
+        //Determine which side the player is on then initialise the memory objects accordingly.
+        if(this.m_side == 'r'){
             ownGoal = (GoalInfo) m_memory.getObject("goal r");
             opposingGoal = (GoalInfo) m_memory.getObject("goal l");
             ownPenalty_c = (FlagInfo) m_memory.getObject("flag p r c");
@@ -102,8 +120,11 @@ class Brain extends Thread implements SensorInput
 		List<ObjectInfo> players = m_memory.getObjects("player");
         // Reset the current perceptions seen in the enviroment 
         List<Belief> currentPerceptions = new LinkedList<Belief>();
-        
 
+        // Descritizing code goes here to translate the current Environment state 
+        // into a list of Perceptions for the agent to add to it's belief base.
+
+        //Add beliefs about the ball.
         if( ball != null ) {
             currentPerceptions.add(Belief.BALL_SEEN);
             if( ball.m_distance < 0.75) {
@@ -125,7 +146,8 @@ class Brain extends Thread implements SensorInput
                 currentPerceptions.add(Belief.BALL_MED_DIST_FROM_GOALIE);
             }
         }
-
+        
+        //Add beliefs about the players own goal line.
         if(ownSideLine != null){
             currentPerceptions.add(Belief.OWN_GOAL_LINE_SEEN);
             if(ownSideLine.m_distance < 10){
@@ -134,6 +156,7 @@ class Brain extends Thread implements SensorInput
 
         }
 
+        //Add beliefs about the center of the pitch.
         if(centre_c != null){
             currentPerceptions.add(Belief.CENTRE_SEEN);
             if(Math.abs(centre_c.m_direction) < 10) {
@@ -151,9 +174,9 @@ class Brain extends Thread implements SensorInput
             }
         }
 
-        if(ownGoal == null && opposingGoal == null){
-
-        }else{
+        //Add beliefs about the two goals and the players position in relation to them.
+        if(ownGoal == null && opposingGoal == null){ }
+        else{
             if(ownGoal != null){
                 currentPerceptions.add(Belief.OWN_GOAL_SEEN);
                 if(ownGoal.m_distance < 50.0) {
@@ -187,6 +210,7 @@ class Brain extends Thread implements SensorInput
             }
         }
 
+        //Add beliefs about the players own penalty box and the players position relative to it.
         if(ownPenalty_c != null){
             currentPerceptions.add(Belief.OWN_PENALTY_SEEN);
             if(Math.abs(ownPenalty_c.getDirection()) < 10) {
@@ -204,6 +228,7 @@ class Brain extends Thread implements SensorInput
             }
         }
 
+        //Add beliefs about the balls position (which side of the pitch it is on).
         if (ball != null && ownGoal != null) {
             // using Law of Cosines to find distance c^2 = a^2 + b^2 - 2abcos(theta)
             double angle_rads = (Math.abs(ball.m_direction - ownGoal.m_direction) * Math.PI) / 180.0;
@@ -224,6 +249,7 @@ class Brain extends Thread implements SensorInput
             }
         }
 
+        //Add beliefs about the other players on the pitch and their positions in relation to the ball.
         if(players.size() > 0){
             if(ball != null){
                 double ballDistance = ball.getDistance();
@@ -260,22 +286,21 @@ class Brain extends Thread implements SensorInput
                         }
                     }
                 }
-
-                
             }
         }
-
         return currentPerceptions;
     }
 
 
     /**
-    *   This function takes in the BDI Agents current intent and sends an
-    *   action to krislet for the player to perform on the server.
-    */
+     * @brief This function takes in the BDI Agents current intent and sends an 
+     * action to Krislet for the player to perform on the server.
+     * @param intent Intent (action) that the BDI agent has identified through 
+     * its reasoning cycle.
+     */
     public void performIntent(Intent intent) {
 
-
+        //Memory objects that the player will need to perform certain actions.
 		BallInfo ball = (BallInfo) environmentObjects[0];
         GoalInfo ownGoal = (GoalInfo) environmentObjects[1];;
         GoalInfo opposingGoal = (GoalInfo) environmentObjects[2];;
@@ -372,18 +397,13 @@ class Brain extends Thread implements SensorInput
     }
 
     /**
-    *   The main loop for the agent.
-    *
-    *   This function runs internally while the game is running, controlling
-    *   the player based on the current environement state, JasonAgent and
-    *   outputs.
-    *
-    *   The while loop constantly descritizes envrionment into "Beliefs",
-    *   sends those beliefs to the JasonAgent to get an intent,
-    *   and then undescritizes that intent into an action to send to krislet.
-    *
+     * @brief The main loop for the agent.
+     * @details This function runs internally while the game is running, controlling 
+     * the player based on the current environement state, JasonAgent and outputs. 
+     * The while loop constantly descritizes envrionment into "Beliefs", sends those 
+     * beliefs to the JasonAgent to get an intent, and then undescritizes that 
+     * intent into an action to send to Krislet.
     */
-
     public void run()
     {
         // Establish Agent
@@ -422,13 +442,11 @@ class Brain extends Thread implements SensorInput
     	m_krislet.bye();
     }
 
-
     /**
-    *   inital starting configuration for each different type of player
-    *
-    */
+     * @brief Operation move determines the movement speed for each type of 
+     * agent then performs the move action.
+     */
     public void move(){
-
         if(m_agent_asl.equals("AgentSpecifications/defender.asl")){
             m_krislet.move( -34 , 0 );
         }else if(m_agent_asl.equals("AgentSpecifications/goalie.asl")){
