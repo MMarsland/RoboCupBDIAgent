@@ -16,9 +16,13 @@
 // If the goalie is not near the goal and is not currently trying to run to the ball, 
 // go to own goal
 +!goToOwnGoal
-    :   own_goal_seen & not at_own_net
-    <-  turn_to_own_goal;  
-        run_to_own_goal;
+    :   own_goal_seen & not at_own_net & facing_own_goal
+    <-  run_to_own_goal;
+        !goToOwnGoal.
+    
++!goToOwnGoal
+    :   not facing_own_goal & not at_own_net
+    <-  turn_to_own_goal;
         !goToOwnGoal.
 
 // If you goalie is at goal, add goalKeep goal
@@ -63,7 +67,7 @@
 +!goalKeep
     :   ball_seen
     <-  turn_to_ball;
-        !findball.
+        !goalKeep.
 
 // If you see the ball and you're not near the ball, run towards the ball
 +!runToBall
@@ -101,4 +105,3 @@
     :   not ball_seen
     <-  look_right;
         !findball.
-
