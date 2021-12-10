@@ -1,6 +1,9 @@
 # RoboCup Jason BDI Agent
-The project is the development of BDI agents using the Jason AgentSpeak
-interface to play simulated soccer in the RoboCup Environment.
+The project is the development of a team of BDI agents using the Jason AgentSpeak
+interface to play simulated soccer in the RoboCup Environment. The RoboCup player 
+project is based on the Krislet example provided for SYSC 5103 by Babak Esfandiari
+(see http://www.sce.carleton.ca/cgi-babak/agentcourse.cgi?RoboCup for more 
+information).
 
 This repo is for the SYSC 5103 Final Project.
 
@@ -12,6 +15,11 @@ agents playing against 5 regular Krislet Agents.
 3. Read, understand, and run playBDIvsKrislet.bat
 
 NOTE: Never run a .bat file without understanding what it will do.
+
+## Run Team of BDI Agents
+To run a team of BDI agents on their own (with no server, monitor, or opponents):
+1. Navigate to the robocup/BDIAgentKrislet/ directory.
+2. Run the TeamStart.bat file.
 
 ## Development
 Files modified during development include:

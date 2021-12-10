@@ -1,9 +1,11 @@
 /**
-*   Descritized environment states into a list of beliefs that the
-*   BDI agent can have about its Environment
+*   Descritized environment states into a list of perception beliefs (atomic propositions) that the
+*   BDI agent can have about its environment.
 *
 *   These beliefs are used by the JasonAgent to make a desision on import junit.framework.TestCase;
-*   intention based on the perceved environment
+*   intention based on the perceived environment.
+*
+*   Each of the beliefs are determined to be true/false in the Brain class getPerceptions() operation.
 */
 public enum Belief {
     BALL_SEEN,
