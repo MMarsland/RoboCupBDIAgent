@@ -9,7 +9,8 @@
 //    Date:             March 4, 2008
 
 
-// Modefied By:  ----
+// Modefied By:  Hari Govindasamy, James Horner, Jon Menard, Micheal Marsland
+// Date: Decemeber 10th 2021
 
 
 import java.lang.Math;
@@ -41,10 +42,11 @@ class Brain extends Thread implements SensorInput
     private ObjectInfo[] environmentObjects;
 
 
-	//---------------------------------------------------------------------------
-    // This constructor:
-    // - stores connection to krislet
-    // - starts thread for this object
+    /**
+    *   This is the constructor.
+    *    It stores a connection to krislet, as well as any information about the agent
+    *   Lastly, it startes the run thread for the agent
+    */
     public Brain(SendCommand krislet, String team, char side, String agent_asl, String playMode){
     	m_timeOver = false;
     	m_krislet = krislet;
@@ -73,10 +75,10 @@ class Brain extends Thread implements SensorInput
         FlagInfo ownPenalty_c;
 
         if(centre_c != null){
-            System.out.println("Flag c: " + centre_c.getDistance());
+            //System.out.println("Flag c: " + centre_c.getDistance());
         }
 
-        if(this.m_side == 'r'){
+        if(this.m_side == 'r'){ // get the right objects, depending on what side you are playing on
             ownGoal = (GoalInfo) m_memory.getObject("goal r");
             opposingGoal = (GoalInfo) m_memory.getObject("goal l");
             ownPenalty_c = (FlagInfo) m_memory.getObject("flag p r c");
@@ -88,6 +90,7 @@ class Brain extends Thread implements SensorInput
             ownSideLine = (LineInfo) m_memory.getObject("line l");
         }
 
+        // store the object to act on when performing an action
         this.environmentObjects[0] = ball;
         this.environmentObjects[1] = ownGoal;
         this.environmentObjects[2] = opposingGoal;
@@ -97,10 +100,9 @@ class Brain extends Thread implements SensorInput
 
 
 		List<ObjectInfo> players = m_memory.getObjects("player");
-        List<Belief> previousPerceptions = perceptions;
+        // Reset the current perceptions seen in the enviroment 
         List<Belief> currentPerceptions = new LinkedList<Belief>();
-        // Descitizing code goes here to translate the current Environment
-        // state into a list of Perceptions for the agent, these
+        
 
         if( ball != null ) {
             currentPerceptions.add(Belief.BALL_SEEN);
@@ -173,6 +175,9 @@ class Brain extends Thread implements SensorInput
                 if( opposingGoal.m_distance < 0.75) {
                     currentPerceptions.add(Belief.AT_OPPOSING_NET);
                 }
+                if(Math.abs(opposingGoal.m_direction) < 10) {
+                    currentPerceptions.add(Belief.FACING_OPPOSING_GOAL);
+                }
 
                 if(opposingGoal.m_direction < 0) {
                     currentPerceptions.add(Belief.ENEMY_GOAL_TO_LEFT);
@@ -200,17 +205,18 @@ class Brain extends Thread implements SensorInput
         }
 
         if (ball != null && ownGoal != null) {
+            // using Law of Cosines to find distance c^2 = a^2 + b^2 - 2abcos(theta)
             double angle_rads = (Math.abs(ball.m_direction - ownGoal.m_direction) * Math.PI) / 180.0;
-            double distance = Math.sqrt(Math.pow(ball.m_distance, 2) + Math.pow(ownGoal.m_distance, 2) - 2.0 * ball.m_distance * ownGoal.m_distance * Math.cos(angle_rads));
+            double distance = getDistance(ball.m_distance,ownGoal.m_distance,angle_rads);
             if (distance < 50.0) {
                 currentPerceptions.add(Belief.BALL_ON_OWN_SIDE);
             } else {
                 currentPerceptions.add(Belief.BALL_ON_ENEMY_SIDE);
             }
-        }
-        else if (ball != null && opposingGoal != null) {
+        }else if (ball != null && opposingGoal != null) {
+            // using Law of Cosines to find distance c^2 = a^2 + b^2 - 2abcos(theta)
             double angle_rads = (Math.abs(ball.m_direction - opposingGoal.m_direction) * Math.PI) / 180.0;
-            double distance = Math.sqrt(Math.pow(ball.m_distance, 2) + Math.pow(opposingGoal.m_distance, 2) - 2.0 * ball.m_distance * opposingGoal.m_distance * Math.cos(angle_rads));
+            double distance = getDistance(ball.m_distance,opposingGoal.m_distance,angle_rads);
             if (distance > 60.0) {
                 currentPerceptions.add(Belief.BALL_ON_OWN_SIDE);
             } else {
@@ -222,40 +228,41 @@ class Brain extends Thread implements SensorInput
             if(ball != null){
                 double ballDistance = ball.getDistance();
                 double ballDirection = ball.getDirection();
-                double shortestBallDistance = 0;
+                double shorterBallDistance = ballDistance + 1;
                 for (ObjectInfo currentPlayer : players) {
                     PlayerInfo player = (PlayerInfo) currentPlayer;
-
-                    if(player.m_teamName.equals(m_team)){
-
+                    
+                    if(player.m_teamName.equals(m_team)){ // if player is a teammate
                         if(!currentPerceptions.contains(Belief.TEAMMATE_AVAILABLE)){
                             currentPerceptions.add(Belief.TEAMMATE_AVAILABLE);
                             this.environmentObjects[3] = player;
                         }
+                        // using Law of Cosines to find distance c^2 = a^2 + b^2 - 2abcos(theta)
                         double angle_rads = (Math.abs(ballDirection - player.m_direction) * Math.PI) / 180.0;
-                        shortestBallDistance = Math.sqrt(Math.pow(ballDistance, 2) + Math.pow(player.m_distance, 2) - 2 * ballDistance * player.m_distance * Math.cos(angle_rads));
-                        if(shortestBallDistance < ballDistance){
+                        double teammateDistance = getDistance(ballDistance,player.m_distance,angle_rads);
+                        if(teammateDistance < ballDistance){ // this player is the closest to the ball
+                            shorterBallDistance = teammateDistance;
                             currentPerceptions.add(Belief.TEAMMATE_CLOSER_TO_BALL);
-                            if(shortestBallDistance < 0.75){
+                            if(shorterBallDistance < 0.75){
                                 currentPerceptions.add(Belief.TEAMMATE_AT_BALL);
                             }
-                        }else{
-                            currentPerceptions.add(Belief.CLOSEST_TO_BALL);
                         }
-                    }else{
-                        if(player.m_distance < 2 && ball.m_distance < 0.5){
+                    }else{ // if player is on opposing team
+                        if(player.m_distance < 1 && ball.m_distance < 0.5){
                             this.environmentObjects[4] = player;
                             currentPerceptions.add(Belief.ENEMY_AT_BALL);
                         }
-                        if(Math.abs(player.m_direction) < 5 && player.m_distance < 10){
-                            this.environmentObjects[4] = player;
-                            currentPerceptions.add(Belief.ENEMY_BLOCKING_SHOT);
+                        if(player.m_distance < 10 && opposingGoal != null ){
+                            if(Math.abs(opposingGoal.m_direction - player.m_direction) < 3){
+                                this.environmentObjects[4] = player;
+                                currentPerceptions.add(Belief.ENEMY_BLOCKING_SHOT);
+                            }
                         }
                     }
                 }
-            }
-        }else{
 
+                
+            }
         }
 
         return currentPerceptions;
@@ -276,7 +283,7 @@ class Brain extends Thread implements SensorInput
         PlayerInfo enemy =  (PlayerInfo) environmentObjects[4];
         FlagInfo centre = (FlagInfo) environmentObjects[5];
         FlagInfo ownPenalty = (FlagInfo) environmentObjects[6];
-
+        
         try {
             switch(intent){
                 case KICK_AT_NET:
@@ -289,7 +296,7 @@ class Brain extends Thread implements SensorInput
                     m_krislet.kick(75, 180);
                     break;
                 case KICK_TO_SIDE:
-                    m_krislet.kick(75, enemy.m_direction + 35);
+                    m_krislet.kick(25, 45);
                     m_krislet.turn(45);
                     break;
                 case KICK_STRAIGHT:
@@ -308,10 +315,13 @@ class Brain extends Thread implements SensorInput
                     m_memory.waitForNewInfo();
                     break;
                 case TURN_TO_OWN_GOAL:
-                     m_krislet.turn(ownGoal.getDirection());
+                    m_krislet.turn(ownGoal.getDirection());
                     break;
                 case TURN_TO_OPPOSING_GOAL:
                     m_krislet.turn(opposingGoal.getDirection());
+                    break;
+                case TURN_UP_FIELD:
+                    m_krislet.turn(opposingGoal.getDirection() + 9);
                     break;
                 case TURN_TO_PLAYER:
                     m_krislet.turn(player.getDirection());
@@ -344,6 +354,9 @@ class Brain extends Thread implements SensorInput
                 case RUN_TO_OWN_PENALTY:
                     m_krislet.dash(100*ownPenalty.getDistance());
                     break;
+                case RUN_UP_FIELD:
+                    m_krislet.dash(100*opposingGoal.getDistance());
+                    break;    
                 case WAIT:
                     m_memory.waitForNewInfo();
                     break;
@@ -396,12 +409,12 @@ class Brain extends Thread implements SensorInput
             //for (ObjectInfo currentPlayer : players) {
             // Get an intent from the Jason Agent based on this cycles new
             // current perceptions so we can perform an action
-            System.out.println("Starting Reasoning:");
-            System.out.println(perceptions.toString());
+            //System.out.println("Starting Reasoning:");
+            //System.out.println(perceptions.toString());
             Intent intent = agent.getIntent(perceptions);
 
-            System.out.println("Got Intent:");
-            System.out.println(intent.toString());
+            //System.out.println("Got Intent:");
+            //System.out.println(intent.toString());
             // Perform the action
             this.performIntent(intent);
         }
@@ -410,6 +423,10 @@ class Brain extends Thread implements SensorInput
     }
 
 
+    /**
+    *   inital starting configuration for each different type of player
+    *
+    */
     public void move(){
 
         if(m_agent_asl.equals("AgentSpecifications/defender.asl")){
@@ -424,6 +441,12 @@ class Brain extends Thread implements SensorInput
             m_krislet.move( -Math.random()*20.5 , Math.random()*30.0 );
         }
 
+    }
+
+
+    // using Law of Cosines to find distance c^2 = a^2 + b^2 - 2abcos(theta)
+    public double getDistance(double a, double b, double theta){
+        return Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2) - (2.0 * a * b * Math.cos(theta)));
     }
 
 
@@ -446,29 +469,15 @@ class Brain extends Thread implements SensorInput
     // This function receives hear information from player
     public void hear(int time, int direction, String message)
     {
-        if(m_side == 'l'){
-            if(message == "goal_r"){
-                move();
-            }
-        }else{
-            if(message == "goal_l"){
-                move();
-            }
-        }
-
 
     }
 
     //---------------------------------------------------------------------------
     // This function receives hear information from referee
-    public void hear(int time, String message)
-    {
-	if(message.compareTo("time_over") == 0)
-	    m_timeOver = true;
-
+    public void hear(int time, String message){
+        if(message.compareTo("time_over") == 0){
+            m_timeOver = true;
+        }
     }
-
-
-
-
 }
+
