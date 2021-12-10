@@ -5,11 +5,11 @@ interface to play simulated soccer in the RoboCup Environment.
 This repo is for the SYSC 5103 Final Project.
 
 ## Simple Running
-This process will allow you to run a simple 2 vs. 2 RoboCup match of two BDI
-agents against 2 regular Krislet Agents.
+This process will allow you to run a simple 5 vs. 5 RoboCup match of 5 BDI
+agents playing against 5 regular Krislet Agents.
 1. Clone the repo to your machine
 2. Read, understand, and run compileCode.bat
-3. Read, understand, and run 2vs2.bat
+3. Read, understand, and run playBDIvsKrislet.bat
 
 NOTE: Never run a .bat file without understanding what it will do.
 

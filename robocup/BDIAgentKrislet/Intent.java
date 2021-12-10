@@ -21,6 +21,7 @@ public enum Intent {
     TURN_TO_PLAYER,
     TURN_TO_CENTRE,
     TURN_TO_OWN_PENALTY,
+    TURN_UP_FIELD,
 
     RUN_TO_PLAYER,
     RUN_TO_BALL,
@@ -28,6 +29,7 @@ public enum Intent {
     RUN_TO_OPPOSING_GOAL,
     RUN_TO_CENTRE,
     RUN_TO_OWN_PENALTY,
+    RUN_UP_FIELD,
 
     WAIT
 }

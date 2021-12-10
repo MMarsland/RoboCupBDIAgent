@@ -7,11 +7,33 @@
     :ball_seen & at_ball & enemy_goal_seen & testing
     <-  kick_at_net.
 
+
+/* If a teammate is not closer anymore, find the ball */
++!waitForBall
+    :   not teammate_closer_to_ball
+    <-  !findball.
+
+/* If a teammate is closer to the ball, run to the enemy net */
++!waitForBall
+    :   not at_opposing_net
+    <-  run_to_opposing_goal;
+        !waitForBall.
+
+/* If at the enemy goal, find the ball */
++!waitForBall
+    :   at_opposing_net
+    <-  !findball.
+
 /* If a teammate is closer to the ball, and the team is attacking, run to the enemy net */
 +!findball
-    :   teammate_closer_to_ball & enemy_goal_seen & not ball_on_own_side
-    <-  run_to_opposing_goal;
-        !findball.
+    :   teammate_closer_to_ball & enemy_goal_seen & not at_opposing_net & facing_oppsing_goal
+    <-  !waitForBall.
+
+/* If a teammate is closer to the ball, and the team is attacking, run to the enemy net */
++!findball
+    :   teammate_closer_to_ball & enemy_goal_seen & not at_opposing_net
+    <-  turn_up_field;
+        !waitForBall.
 
 /* If facing the ball and not at the ball, then run to the ball. Rememeber the ball is to the left */
 +!findball
