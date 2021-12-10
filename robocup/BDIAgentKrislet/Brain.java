@@ -225,9 +225,10 @@ class Brain extends Thread implements SensorInput
                 double shortestBallDistance = 0;
                 for (ObjectInfo currentPlayer : players) {
                     PlayerInfo player = (PlayerInfo) currentPlayer;
-
+                    
                     if(player.m_teamName.equals(m_team)){
 
+                    
                         if(!currentPerceptions.contains(Belief.TEAMMATE_AVAILABLE)){
                             currentPerceptions.add(Belief.TEAMMATE_AVAILABLE);
                             this.environmentObjects[3] = player;

@@ -128,6 +128,10 @@ class Krislet implements SendCommand
 	m_team = team;
 	m_playing = true;
 	m_asl_file_name = asl_file_name;
+	m_goalie = false;
+	if(asl_file_name.contains("goalie")){
+		m_goalie = true;
+	}
     }
 
     //---------------------------------------------------------------------------
@@ -248,7 +252,12 @@ class Krislet implements SendCommand
     // This function sends initialization command to the server
     private void init()
     {
-	send("(init " + m_team + " (version 9))");
+		if(!m_goalie){
+			send("(init " + m_team + " (version 9))");
+		}else{
+			send("(init " + m_team + " (version 9) (goalie))");
+		}
+	
     }
 
     //---------------------------------------------------------------------------
@@ -343,6 +352,7 @@ class Krislet implements SendCommand
     private SensorInput		m_brain;		// input for sensor information
     private boolean             m_playing;              // controls the MainLoop
 	private String		m_asl_file_name;		// name of the ASL
+	private boolean 	m_goalie;
     private Pattern message_pattern = Pattern.compile("^\\((\\w+?)\\s.*");
     private Pattern hear_pattern = Pattern.compile("^\\(hear\\s(\\w+?)\\s(\\w+?)\\s(.*)\\).*");
     //private Pattern coach_pattern = Pattern.compile("coach");
