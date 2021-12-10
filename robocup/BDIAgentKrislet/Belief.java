@@ -17,7 +17,6 @@ public enum Belief {
     BALL_TO_LEFT,
     BALL_TO_RIGHT,
 
-    CLOSEST_TO_BALL,
     TEAMMATE_AT_BALL,
     TEAMMATE_CLOSER_TO_BALL,
     AT_BALL,
@@ -32,6 +31,7 @@ public enum Belief {
     BALL_ON_ENEMY_SIDE,
     BALL_MED_DIST_FROM_GOALIE,
     FACING_OWN_GOAL,
+    FACING_OPPOSING_GOAL,
 
     TEAMMATE_AVAILABLE,
 
@@ -48,6 +48,8 @@ public enum Belief {
     OWN_PENALTY_TO_LEFT,
     OWN_PENALTY_TO_RIGHT,
     CLOSE_TO_OWN_PENALTY,
+
+    
 
 
     CLOSE_TO_SAME_GOAL_LINE,
